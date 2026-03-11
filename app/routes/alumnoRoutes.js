@@ -9,4 +9,4 @@ apiRoutes
 .get('/getAlumnos', async (req, res) => await 
 alumnoController.findAll(req, res));
 
-module.exports = apiRouter;
+module.exports = apiRoutes;
