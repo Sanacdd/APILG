@@ -2,9 +2,10 @@
 const express = require('express');
 const claseController = require('../Controllers/claseController');
 
-const apiRouter = express.Router();
+const apiRoutes = express.Router();
 
-apiRouter.get('/clases', claseController.findAll);
-apiRouter.get('/getClases', async (req, res) => await claseController.findAll(req, res));
+apiRoutes
+.get('/clases', claseController.findAll)
+.get('/getClases', async (req, res) => await claseController.findAll(req, res));
 
-module.exports = apiRouter;
+module.exports = apiRoutes;

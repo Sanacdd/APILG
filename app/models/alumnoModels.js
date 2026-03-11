@@ -2,16 +2,16 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const attributes = {
-    ID_Alumno: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
+      ID_Alumno: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
 
-    ID_Grado: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
+      ID_Grado: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
 
     Nombre: {
       type: DataTypes.STRING(50),

@@ -2,10 +2,11 @@
 const express = require('express');
 const alumnoController = require('../Controllers/alumnoController'); 
 
-const apiRouter = express.Router();
+const apiRoutes = express.Router();
 
-apiRouter.get('/alumnos', alumnoController.findAll);
-apiRouter.get('/getAlumnos', async (req, res) => await 
+apiRoutes
+.get('/alumnos', alumnoController.findAll)
+.get('/getAlumnos', async (req, res) => await 
 alumnoController.findAll(req, res));
 
 module.exports = apiRouter;

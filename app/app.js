@@ -16,5 +16,8 @@ app.use('/api', alumnoRoutes);
 //Tabla clase ruta
 const claseRoutes = require('./routes/claseRoutes'); 
 app.use('/api', claseRoutes); 
+//Tabla grado ruta
+const gradoRoutes = require('./routes/gradoRoutes');
+app.use('/api', gradoRoutes);
 
 module.exports = app;
