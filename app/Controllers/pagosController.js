@@ -2,10 +2,10 @@
 
 //const { request } = require('../app');
 const db = require('../config/db');
-const Padre = db.padre;
+const Pagos = db.pagos;
 
 async function findAll(req, res){
-Padre.findAll()
+Pagos.findAll()
     .then(data => {
         res.status(200).send(data);
     })
