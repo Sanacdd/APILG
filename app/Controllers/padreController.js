@@ -19,7 +19,7 @@ async function insertPadre(request, response){
     Padre.create({
         nombre: padreInsert.nombre,
         apellido: padreInsert.apellido,
-        // Agrega aquí los demás campos según tu tabla de padres
+        
     })
     .then(data => {
         response.status(200).send(data);
