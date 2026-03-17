@@ -7,6 +7,8 @@ const apiRoutes = express.Router();
 apiRoutes
 .get('/alumnos', alumnoController.findAll)
 .get('/getAlumnos', async (req, res) => await 
-alumnoController.findAll(req, res));
+alumnoController.findAll(req, res))
+.post('/insertAlumno', alumnoController.insertAlumno)
+.put('/updateAlumno', alumnoController.updateAlumno);
 
 module.exports = apiRoutes;
