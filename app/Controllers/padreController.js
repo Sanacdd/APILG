@@ -1,18 +1,35 @@
 'use strict'
 
-//const { request } = require('../app');
 const db = require('../config/db');
 const Padre = db.padre;
 
 async function findAll(req, res){
-Padre.findAll()
-    .then(data => {
-        res.status(200).send(data);
-    })
-    .catch(error =>{;
-      res.status(400).send(error);
-})
+    Padre.findAll()
+        .then(data => {
+            res.status(200).send(data);
+        })
+        .catch(error => {
+            res.status(400).send(error);
+        });
 }
+
+async function insertPadre(request, response){
+    const padreInsert = request.body;
+
+    Padre.create({
+        nombre: padreInsert.nombre,
+        apellido: padreInsert.apellido,
+        // Agrega aquí los demás campos según tu tabla de padres
+    })
+    .then(data => {
+        response.status(200).send(data);
+    })
+    .catch(error => {
+        response.status(400).send(error);
+    });
+}
+
 module.exports = {
-    findAll
+    findAll,
+    insertPadre
 }
