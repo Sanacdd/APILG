@@ -1,10 +1,10 @@
 'use strict'
 
 const db = require('../config/db');
-const Actor = db.alumno;  
+const Alumno = db.alumno;  
 
 async function findAll(req, res){
-    Actor.findAll()
+    Alumno.findAll()
         .then(data => {
             res.status(200).send(data);
         })
@@ -16,11 +16,13 @@ async function findAll(req, res){
 async function insertAlumno(request, response){
     const alumnoInsert = request.body;
 
-    Actor.create({
-        alumno_id: alumnoInsert.id,
-        first_name: alumnoInsert.name,
-        last_name: alumnoInsert.last,
-        // Agrega los demás campos de tu tabla alumno
+    Alumno.create({
+        ID_Grado: alumnoInsert.ID_Grado,
+        Nombre: alumnoInsert.Nombre,
+        Apellido: alumnoInsert.Apellido,
+        Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
+        Direccion: alumnoInsert.Direccion,
+        Genero: alumnoInsert.Genero
     })
     .then(data => {
         response.status(200).send(data);
@@ -33,8 +35,8 @@ async function insertAlumno(request, response){
 async function updateAlumno(request, response){
     const alumnoUpdate = request.body;
 
-    Actor.update(alumnoUpdate, {
-        where: { alumno_id: alumnoUpdate.id }
+    Alumno.update(alumnoUpdate, {
+        where: { ID_Alumno: alumnoUpdate.ID_Alumno }
     })
     .then(num => {
         if(num == 1){
