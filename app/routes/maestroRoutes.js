@@ -1,6 +1,6 @@
 'use strict'
 const express = require('express');
-const maestroController = require('../Controllers/maestroController'); 
+const maestroController = require('../Controllers/maestroControllers'); 
 
 const apiRoutes = express.Router();
 

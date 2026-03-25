@@ -6,6 +6,8 @@ const apiRoutes = express.Router();
 
 apiRoutes
 .get('/grados', gradoController.findAll)
-.get('/getGrados', async (req, res) => await gradoController.findAll(req, res));
+.get('/getGrados', async (req, res) => await gradoController.findAll(req, res))
+.post('/insertGrado', gradoController.insertGrado)
+.put('/updateGrado', gradoController.updateGrado);
 
 module.exports = apiRoutes;

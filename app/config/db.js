@@ -30,5 +30,8 @@ db.sequelizeInstance = sequelizeInstance;
 db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
 db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
+db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
+db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
+db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
 
 module.exports = db;
