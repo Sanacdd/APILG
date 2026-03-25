@@ -17,8 +17,8 @@ async function insertClase(request, response){
     const claseInsert = request.body;
 
     Clase.create({
-        nombre: claseInsert.nombre,
-        descripcion: claseInsert.descripcion,
+        ID_Clase: claseInsert.ID_Clase,
+        Nombre_Clase: claseInsert.Nombre_Clase,
     })
     .then(data => {
         response.status(200).send(data);
@@ -32,7 +32,7 @@ async function updateClase(request, response){
     const claseUpdate = request.body;
 
     Clase.update(claseUpdate, {
-        where: { id: claseUpdate.id }
+        where: { ID_Clase: claseUpdate.ID_Clase }
     })
     .then(num => {
         if(num == 1){
