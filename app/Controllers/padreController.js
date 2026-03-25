@@ -3,7 +3,7 @@
 const db = require('../config/db');
 const Padre = db.padre;
 
-async function findAll(req, res){
+async function findAll(req, res) {
     Padre.findAll()
         .then(data => {
             res.status(200).send(data);
@@ -13,42 +13,47 @@ async function findAll(req, res){
         });
 }
 
-async function insertPadre(request, response){
+async function insertPadre(request, response) {
     const padreInsert = request.body;
 
     Padre.create({
-        nombre: padreInsert.nombre,
-        apellido: padreInsert.apellido,
+        ID_Alumno: padreInsert.ID_Alumno  || null,  // INT, nullable
+        Nombre:    padreInsert.Nombre,               // VARCHAR(50), NOT NULL
+        Apellido:  padreInsert.Apellido,             // VARCHAR(50), NOT NULL
+        Telefono:  padreInsert.Telefono   || null,  // VARCHAR(15), nullable
+        Correo:    padreInsert.Correo     || null,  // VARCHAR(100), nullable
+        Direccion: padreInsert.Direccion  || null,  // VARCHAR(100), nullable
     })
     .then(data => {
-        response.status(200).send(data);
+        response.status(201).send(data);
     })
     .catch(error => {
-        response.status(400).send(error);
+        response.status(400).send({ message: error.message || "Error al insertar el padre" });
     });
 }
 
-async function updatePadre(request, response){
+async function updatePadre(request, response) {
     const padreUpdate = request.body;
 
-    Padre.update(padreUpdate, {
-        where: { id: padreUpdate.id }
+    Padre.update({
+        ID_Alumno: padreUpdate.ID_Alumno  || null,
+        Nombre:    padreUpdate.Nombre,
+        Apellido:  padreUpdate.Apellido,
+        Telefono:  padreUpdate.Telefono   || null,
+        Correo:    padreUpdate.Correo     || null,
+        Direccion: padreUpdate.Direccion  || null,
+    }, {
+        where: { ID_Padre: padreUpdate.ID_Padre }  // busca por PK
     })
     .then(num => {
-        if(num == 1){
-            response.status(200).send({
-                message: "Padre actualizado correctamente"
-            });
+        if (num == 1) {
+            response.status(200).send({ message: "Padre actualizado correctamente" });
         } else {
-            response.status(400).send({
-                message: "No se pudo actualizar el padre"
-            });
+            response.status(404).send({ message: "No se encontró el padre" });
         }
     })
     .catch(error => {
-        response.status(500).send({
-            message: error.message || "Error al actualizar el padre"
-        });
+        response.status(500).send({ message: error.message || "Error al actualizar el padre" });
     });
 }
 
