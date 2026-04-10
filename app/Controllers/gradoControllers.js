@@ -4,57 +4,69 @@ const db = require('../config/db');
 const Grado = db.grado;
 
 async function findAll(req, res) {
-    Grado.findAll()
-        .then(data => {
-            res.status(200).send(data);
-        })
-        .catch(error => {
-            res.status(400).send(error);
-        });
+    Grado.findAll({
+        include: [{
+            model: db.clase,
+            attributes: ['ID_Clase', 'Nombre_Clase']
+        }]
+    })
+    .then(data => res.status(200).send(data))
+    .catch(error => res.status(400).send(error));
 }
 
-async function insertGrado(request, response) {
-    const gradoInsert = request.body;
+async function insertGrado(req, res) {
+    const g = req.body;
 
     Grado.create({
-        ID_Clase:     gradoInsert.ID_Clase    || null,  // INT, nullable
-        Nombre_Grado: gradoInsert.Nombre_Grado,         // VARCHAR(50), NOT NULL
-        Seccion:      gradoInsert.Seccion     || null,  // VARCHAR(10), nullable
-        Anio:         gradoInsert.Anio        || null,  // YEAR, nullable
+        ID_Clase: g.ID_Clase || null,
+        Nombre_Grado: g.Nombre_Grado,
+        Seccion: g.Seccion || null,
+        Anio: g.Anio || null,
     })
-    .then(data => {
-        response.status(201).send(data);
-    })
-    .catch(error => {
-        response.status(400).send({ message: error.message || "Error al insertar el grado" });
-    });
+    .then(data => res.status(201).send(data))
+    .catch(error => res.status(400).send(error));
 }
 
-async function updateGrado(request, response) {
-    const gradoUpdate = request.body;
+async function updateGrado(req, res) {
+    const g = req.body;
 
     Grado.update({
-        ID_Clase:     gradoUpdate.ID_Clase    || null,
-        Nombre_Grado: gradoUpdate.Nombre_Grado,
-        Seccion:      gradoUpdate.Seccion     || null,
-        Anio:         gradoUpdate.Anio        || null,
+        ID_Clase: g.ID_Clase || null,
+        Nombre_Grado: g.Nombre_Grado,
+        Seccion: g.Seccion || null,
+        Anio: g.Anio || null,
     }, {
-        where: { ID_Grado: gradoUpdate.ID_Grado }  // busca por PK
+        where: { ID_Grado: g.ID_Grado }
+    })
+    .then(([num]) => {
+        if (num == 1) {
+            res.send("Actualizado");
+        } else {
+            res.send("No encontrado");
+        }
+    })
+    .catch(error => res.status(500).send(error));
+}
+
+async function deleteGrado(req, res) {
+    const id = req.params.id;
+
+    Grado.destroy({
+        where: { ID_Grado: id }
     })
     .then(num => {
         if (num == 1) {
-            response.status(200).send({ message: "Grado actualizado correctamente" });
+            res.send("Eliminado");
         } else {
-            response.status(404).send({ message: "No se encontró el grado" });
+            res.send("No encontrado");
         }
     })
-    .catch(error => {
-        response.status(500).send({ message: error.message || "Error al actualizar el grado" });
-    });
+    .catch(error => res.status(500).send(error));
 }
 
 module.exports = {
     findAll,
     insertGrado,
-    updateGrado
-}
+    updateGrado,
+    deleteGrado
+};

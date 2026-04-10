@@ -5,8 +5,7 @@ const alumnoController = require('../Controllers/alumnoController');
 const apiRoutes = express.Router();
 
 apiRoutes
-.get('/alumnos', alumnoController.findAll)
-.get('/getAlumnos', async (req, res) => await 
+.get('/alumnos', async (req, res) => await 
 alumnoController.findAll(req, res))
 .post('/insertAlumno', alumnoController.insertAlumno)
 .put('/updateAlumno', alumnoController.updateAlumno);
