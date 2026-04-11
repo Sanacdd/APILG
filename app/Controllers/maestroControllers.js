@@ -17,11 +17,11 @@ async function insertMaestro(request, response) {
     const maestroInsert = request.body;
 
     Maestro.create({
-        ID_Grado:  maestroInsert.ID_Grado  || null,  // INT, nullable
-        Nombre:    maestroInsert.Nombre,              // VARCHAR(50), NOT NULL
-        Apellido:  maestroInsert.Apellido,            // VARCHAR(50), NOT NULL
-        Telefono:  maestroInsert.Telefono  || null,  // VARCHAR(15), nullable
-        Correo:    maestroInsert.Correo    || null,  // VARCHAR(100), nullable
+        ID_Grado:  maestroInsert.ID_Grado  || null,  
+        Nombre:    maestroInsert.Nombre,              
+        Apellido:  maestroInsert.Apellido,            
+        Telefono:  maestroInsert.Telefono  || null,  
+        Correo:    maestroInsert.Correo    || null,  
     })
     .then(data => {
         response.status(201).send(data);
