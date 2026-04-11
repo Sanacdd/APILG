@@ -17,12 +17,12 @@ async function insertPadre(request, response) {
     const padreInsert = request.body;
 
     Padre.create({
-        ID_Alumno: padreInsert.ID_Alumno  || null,  // INT, nullable
-        Nombre:    padreInsert.Nombre,               // VARCHAR(50), NOT NULL
-        Apellido:  padreInsert.Apellido,             // VARCHAR(50), NOT NULL
-        Telefono:  padreInsert.Telefono   || null,  // VARCHAR(15), nullable
-        Correo:    padreInsert.Correo     || null,  // VARCHAR(100), nullable
-        Direccion: padreInsert.Direccion  || null,  // VARCHAR(100), nullable
+        ID_Alumno: padreInsert.ID_Alumno  || null,  
+        Nombre:    padreInsert.Nombre,               
+        Apellido:  padreInsert.Apellido,             
+        Telefono:  padreInsert.Telefono   || null,  
+        Correo:    padreInsert.Correo     || null,  
+        Direccion: padreInsert.Direccion  || null,  
     })
     .then(data => {
         response.status(201).send(data);
