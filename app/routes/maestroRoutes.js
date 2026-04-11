@@ -5,8 +5,7 @@ const maestroController = require('../Controllers/maestroControllers');
 const apiRoutes = express.Router();
 
 apiRoutes
-.get('/maestros', maestroController.findAll)
-.get('/getMaestros', async (req, res) => await 
+.get('/maestros',  async (req, res) => await 
 maestroController.findAll(req, res))
 .post('/insertMaestro', maestroController.insertMaestro)
 .put('/updateMaestro', maestroController.updateMaestro);
