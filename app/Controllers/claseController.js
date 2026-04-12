@@ -52,8 +52,33 @@ async function updateClase(request, response){
     });
 }
 
+async function deleteClase(request, response){
+    const { ID_Clase } = request.params;
+
+    Clase.destroy({
+        where: { ID_Clase: ID_Clase }
+    })
+    .then(num => {
+        if(num == 1){
+            response.status(200).send({
+                message: "Clase eliminada correctamente"
+            });
+        } else {
+            response.status(400).send({
+                message: "No se encontró la clase"
+            });
+        }
+    })
+    .catch(error => {
+        response.status(500).send({
+            message: error.message || "Error al eliminar la clase"
+        });
+    });
+}
+
 module.exports = {
     findAll,
     insertClase,
-    updateClase
+    updateClase,
+    deleteClase
 }

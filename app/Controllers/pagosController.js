@@ -56,8 +56,68 @@ async function updatePago(request, response){
     });
 }
 
+async function deletePago(req, res){
+    const { ID_Pagos } = req.params;
+
+    Pagos.destroy({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(() => {
+        res.status(200).send({
+            message: "Pago eliminado correctamente"
+        });
+    })
+    .catch(error => {
+        res.status(400).send(error);
+    });
+
+
+
+async function findOne(req, res){
+    const { ID_Pagos } = req.params;
+
+    Pagos.findOne({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(data => {
+        if(data){
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({
+                message: "Pago no encontrado"
+            });
+        }
+    })
+    .catch(error => {
+        res.status(400).send(error);
+    });
+}
+
+
+}
+async function findOne(req, res) {
+    const { ID_Pagos } = req.params;
+
+    Pagos.findOne({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(data => {
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({
+                message: "Pago no encontrado"
+            });
+        }
+    })
+    .catch(error => {
+        res.status(500).send(error);
+    });
+}
 module.exports = {
     findAll,
+    findOne,
     insertPago,
-    updatePago
+    updatePago,
+    deletePago
 }
