@@ -7,5 +7,7 @@ apiRoutes
 .get('/clases', async (req, res) => await 
 claseController.findAll(req, res))
 .post('/insertClase', claseController.insertClase)
-.put('/updateClase', claseController.updateClase);
+.put('/updateClase', claseController.updateClase)
+.delete('/deleteClase/:ID_Clase', claseController.deleteClase); 
+
 module.exports = apiRoutes;
