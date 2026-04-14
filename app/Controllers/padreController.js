@@ -15,14 +15,13 @@ async function findAll(req, res) {
 
 async function insertPadre(request, response) {
     const padreInsert = request.body;
-
     Padre.create({
-        ID_Alumno: padreInsert.ID_Alumno  || null,  // INT, nullable
-        Nombre:    padreInsert.Nombre,               // VARCHAR(50), NOT NULL
-        Apellido:  padreInsert.Apellido,             // VARCHAR(50), NOT NULL
-        Telefono:  padreInsert.Telefono   || null,  // VARCHAR(15), nullable
-        Correo:    padreInsert.Correo     || null,  // VARCHAR(100), nullable
-        Direccion: padreInsert.Direccion  || null,  // VARCHAR(100), nullable
+        ID_Alumno: padreInsert.ID_Alumno  || null,
+        Nombre:    padreInsert.Nombre,
+        Apellido:  padreInsert.Apellido,
+        Telefono:  padreInsert.Telefono   || null,
+        Correo:    padreInsert.Correo     || null,
+        Direccion: padreInsert.Direccion  || null,
     })
     .then(data => {
         response.status(201).send(data);
@@ -34,7 +33,6 @@ async function insertPadre(request, response) {
 
 async function updatePadre(request, response) {
     const padreUpdate = request.body;
-
     Padre.update({
         ID_Alumno: padreUpdate.ID_Alumno  || null,
         Nombre:    padreUpdate.Nombre,
@@ -43,7 +41,7 @@ async function updatePadre(request, response) {
         Correo:    padreUpdate.Correo     || null,
         Direccion: padreUpdate.Direccion  || null,
     }, {
-        where: { ID_Padre: padreUpdate.ID_Padre }  // busca por PK
+        where: { ID_Padre: padreUpdate.ID_Padre }
     })
     .then(num => {
         if (num == 1) {
@@ -57,8 +55,26 @@ async function updatePadre(request, response) {
     });
 }
 
+async function deletePadre(request, response) {
+    const id = request.params.id;
+    Padre.destroy({
+        where: { ID_Padre: id }
+    })
+    .then(num => {
+        if (num == 1) {
+            response.status(200).send({ message: "Padre eliminado correctamente" });
+        } else {
+            response.status(404).send({ message: "No se encontró el padre" });
+        }
+    })
+    .catch(error => {
+        response.status(500).json({ error: "No se puede eliminar el padre porque tiene registros asociados" });
+    });
+}
+
 module.exports = {
     findAll,
     insertPadre,
-    updatePadre
-}
+    updatePadre,
+    deletePadre
+};
