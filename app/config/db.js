@@ -6,7 +6,7 @@ const sequelizeInstance = new Sequelize(
     process.env.DB_USER, 
     process.env.PASSWORD, 
 {
-    host: process.env.HOST,
+    host: process.env.HOST,//
     dialect: process.env.DIALECT,
     port: process.env.MY_SQL_PORT,
     dialectOptions: {
@@ -27,8 +27,8 @@ db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
 db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance, Sequelize);
 db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
-db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
-db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
+db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);//Aquí se importa el modelo de pagos, que se define en el archivo pagosModels.js, y se le pasa la instancia de Sequelize y el objeto Sequelize para que pueda definir su estructura y relaciones.
+db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);//Aquí se establece la relación entre el modelo de grado y el modelo de clase, indicando que un grado pertenece a una clase a través de la clave foránea ID_Clase.
 
 db.grado.belongsToMany(db.clase, {
     through: db.gradoClase,

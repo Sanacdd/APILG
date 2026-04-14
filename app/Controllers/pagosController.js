@@ -3,6 +3,8 @@
 const db = require('../config/db');
 const Pagos = db.pagos;
 
+
+//Esta función trae todos los pagos registrados.
 async function findAll(req, res){
     Pagos.findAll()
         .then(data => {
@@ -12,7 +14,7 @@ async function findAll(req, res){
             res.status(400).send(error);
         });
 }
-
+//Esta función registra un nuevo pago.
 async function insertPago(request, response){
     const pagoInsert = request.body;
 
@@ -31,7 +33,7 @@ async function insertPago(request, response){
         response.status(400).send(error);
     });
 }
-
+//“La función updatePago permite modificar un registro existente, identificándolo por su llave primaria ID_Pagos.”
 async function updatePago(request, response){
     const pagoUpdate = request.body;
 
@@ -55,9 +57,69 @@ async function updatePago(request, response){
         });
     });
 }
+//Esta función elimina un pago.
+async function deletePago(req, res){
+    const { ID_Pagos } = req.params;
 
+    Pagos.destroy({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(() => {
+        res.status(200).send({
+            message: "Pago eliminado correctamente"
+        });
+    })
+    .catch(error => {
+        res.status(400).send(error);
+    });
+
+//Esta función busca un solo pago por su ID.
+
+async function findOne(req, res){
+    const { ID_Pagos } = req.params;
+
+    Pagos.findOne({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(data => {
+        if(data){
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({
+                message: "Pago no encontrado"
+            });
+        }
+    })
+    .catch(error => {
+        res.status(400).send(error);
+    });
+}
+
+
+}
+async function findOne(req, res) {
+    const { ID_Pagos } = req.params;
+
+    Pagos.findOne({
+        where: { ID_Pagos: ID_Pagos }
+    })
+    .then(data => {
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send({
+                message: "Pago no encontrado"
+            });
+        }
+    })
+    .catch(error => {
+        res.status(500).send(error);
+    });
+}
 module.exports = {
     findAll,
+    findOne,
     insertPago,
-    updatePago
+    updatePago,
+    deletePago
 }
