@@ -32,7 +32,5 @@ app.use('/api', pagosRoutes);
 const archivoRoutes = require('./routes/archivoRoutes');
 app.use('/api', archivoRoutes);
 
-const archivoRoutes = require('./routes/archivoRoutes');
-app.use('/api', archivoRoutes);
 
 module.exports = app;
