@@ -33,7 +33,7 @@ db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
 db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
 db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
 db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
-
+db.archivo = require('../models/archivoModels')(sequelizeInstance, Sequelize);
 db.grado.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });

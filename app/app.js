@@ -28,5 +28,8 @@ app.use('/api', padreRoutes);
 //Tabla pagos ruta
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
+// Tabla archivo ruta
+const archivoRoutes = require('./routes/archivoRoutes');
+app.use('/api', archivoRoutes);
 
 module.exports = app;
