@@ -29,4 +29,7 @@ app.use('/api', padreRoutes);
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
 
+const archivoRoutes = require('./routes/archivoRoutes');
+app.use('/api', archivoRoutes);
+
 module.exports = app;

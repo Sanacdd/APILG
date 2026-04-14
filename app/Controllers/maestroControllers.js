@@ -17,11 +17,11 @@ async function insertMaestro(request, response) {
     const maestroInsert = request.body;
 
     Maestro.create({
-        ID_Grado:  maestroInsert.ID_Grado  || null,  // INT, nullable
-        Nombre:    maestroInsert.Nombre,              // VARCHAR(50), NOT NULL
-        Apellido:  maestroInsert.Apellido,            // VARCHAR(50), NOT NULL
-        Telefono:  maestroInsert.Telefono  || null,  // VARCHAR(15), nullable
-        Correo:    maestroInsert.Correo    || null,  // VARCHAR(100), nullable
+        ID_Grado:  maestroInsert.ID_Grado || null,
+        Nombre:    maestroInsert.Nombre,
+        Apellido:  maestroInsert.Apellido,
+        Telefono:  maestroInsert.Telefono || null,
+        Correo:    maestroInsert.Correo || null,
     })
     .then(data => {
         response.status(201).send(data);
@@ -35,13 +35,13 @@ async function updateMaestro(request, response) {
     const maestroUpdate = request.body;
 
     Maestro.update({
-        ID_Grado:  maestroUpdate.ID_Grado  || null,
+        ID_Grado:  maestroUpdate.ID_Grado || null,
         Nombre:    maestroUpdate.Nombre,
         Apellido:  maestroUpdate.Apellido,
-        Telefono:  maestroUpdate.Telefono  || null,
-        Correo:    maestroUpdate.Correo    || null,
+        Telefono:  maestroUpdate.Telefono || null,
+        Correo:    maestroUpdate.Correo || null,
     }, {
-        where: { ID_Maestro: maestroUpdate.ID_Maestro }  // busca por PK
+        where: { ID_Maestro: maestroUpdate.ID_Maestro }
     })
     .then(num => {
         if (num == 1) {
@@ -55,8 +55,27 @@ async function updateMaestro(request, response) {
     });
 }
 
+async function deleteMaestro(request, response) {
+    const id = request.params.id;
+
+    Maestro.destroy({
+        where: { ID_Maestro: id }
+    })
+    .then(num => {
+        if (num == 1) {
+            response.status(200).send({ message: "Maestro eliminado correctamente" });
+        } else {
+            response.status(404).send({ message: "No se encontró el maestro" });
+        }
+    })
+    .catch(error => {
+        response.status(500).send({ message: error.message || "Error al eliminar el maestro" });
+    });
+}
+
 module.exports = {
     findAll,
     insertMaestro,
-    updateMaestro
+    updateMaestro,
+    deleteMaestro
 }
