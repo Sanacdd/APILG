@@ -26,7 +26,7 @@ async function insertGrado(req, res) {
         return res.status(400).json({ error: `Ya existe el grado ${g.Nombre_Grado} sección ${g.Seccion} del año ${g.Anio}` });
     }
     Grado.create({
-        ID_Clase: g.ID_Clase || null,
+       
         Nombre_Grado: g.Nombre_Grado,
         Seccion: g.Seccion || null,
         Anio: g.Anio || null,

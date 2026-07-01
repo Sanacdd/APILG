@@ -22,6 +22,7 @@ const sequelizeInstance = new Sequelize(
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
+
 db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
 db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
@@ -32,4 +33,68 @@ db.archivo = require('../models/archivoModels')(sequelizeInstance, Sequelize);
 db.grado.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
+
+
+db.alumno = require('../models/alumnoModels')(sequelizeInstance);
+db.clase = require('../models/claseModels')(sequelizeInstance);
+db.grado = require('../models/gradoModels')(sequelizeInstance);
+db.maestroGrado = require('../models/maestroGradoModels')(sequelizeInstance);
+db.maestro = require('../models/maestroModels')(sequelizeInstance);
+db.padre = require('../models/padreModels')(sequelizeInstance);
+db.pagos = require('../models/pagosModels')(sequelizeInstance);
+db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
+
+
+
+/* MAESTRO <-> GRADO*/
+
+db.maestro.belongsToMany(db.grado, {
+    through: db.maestroGrado,
+    foreignKey: 'DNI_Maestro',
+    otherKey: 'ID_Grado'
+});
+
+db.grado.belongsToMany(db.maestro, {
+    through: db.maestroGrado,
+    foreignKey: 'ID_Grado',
+    otherKey: 'DNI_Maestro'
+});
+
+/* GRADO <-> CLASE */
+
+db.grado.belongsToMany(db.clase, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Grado',
+    otherKey: 'ID_Clase'
+});
+
+db.clase.belongsToMany(db.grado, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Clase',
+    otherKey: 'ID_Grado'
+});
+
+/* PADRE -> ALUMNO */
+
+db.padre.hasMany(db.alumno, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.alumno.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
+
+/* GRADO -> ALUMNO */
+
+db.grado.hasMany(db.alumno, {
+    foreignKey: 'ID_Grado'
+});
+
+db.alumno.belongsTo(db.grado, {
+    foreignKey: 'ID_Grado'
+});
+
+
 module.exports = db;

@@ -19,6 +19,9 @@ app.use('/api', claseRoutes);
 //Tabla grado ruta
 const gradoRoutes = require('./routes/gradoRoutes');
 app.use('/api', gradoRoutes);
+// Tabla grado_clase ruta
+const gradoClaseRoutes = require('./routes/gradoClaseRoutes');
+app.use('/api', gradoClaseRoutes);
 //Tabla maestro ruta
 const maestroRoutes = require('./routes/maestroRoutes');
 app.use('/api', maestroRoutes);
