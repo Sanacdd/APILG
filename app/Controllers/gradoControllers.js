@@ -29,7 +29,6 @@ async function insertGrado(req, res) {
     }
 
     Grado.create({
-        ID_Clase: g.ID_Clase,
         Nombre_Grado: g.Nombre_Grado,
         Seccion: g.Seccion || null,
         Anio: g.Anio || null,
@@ -49,7 +48,6 @@ async function updateGrado(req, res) {
     const g = req.body;
 
     Grado.update({
-        ID_Clase: g.ID_Clase,
         Nombre_Grado: g.Nombre_Grado,
         Seccion: g.Seccion || null,
         Anio: g.Anio || null,
