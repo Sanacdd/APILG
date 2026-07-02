@@ -8,6 +8,7 @@ apiRoutes
 .get('/pagos', async (req, res) => await
 pagosController.findAll(req, res))
 .post('/insertPago', pagosController.insertPago)
-.put('/updatePago', pagosController.updatePago);
+.put('/updatePago', pagosController.updatePago)
+.delete('/deletePago/:id', pagosController.deletePago);
 
 module.exports = apiRoutes;

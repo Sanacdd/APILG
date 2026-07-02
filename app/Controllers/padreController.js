@@ -2,12 +2,19 @@
 
 const db = require('../config/db');
 const Padre = db.padre;
+const Alumno = db.alumno;
 
 async function findAll(req, res) {
 
     try {
 
-        const data = await Padre.findAll();
+        const data = await Padre.findAll({
+            include: [
+                {
+                    model: Alumno
+                }
+            ]
+        });
 
         res.status(200).send(data);
 

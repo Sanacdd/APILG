@@ -25,19 +25,24 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
+    Mes_Correspondiente: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+
+    Anio_Correspondiente: {
+      type: DataTypes.SMALLINT,
+      allowNull: false,
+    },
+
     Monto: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
 
-    Metodo_Pago: {
+    Numero_Referencia: {
       type: DataTypes.STRING(30),
-      allowNull: true,
-    },
-
-    Estado: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
+      allowNull: false,
     },
 
   }, {

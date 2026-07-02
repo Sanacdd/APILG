@@ -2,13 +2,30 @@
 
 const db = require('../config/db');
 const Alumno = db.alumno;
+const { Op } = require("sequelize");
+
+const Padre = db.padre;
+const Grado = db.grado;
+const Pagos = db.pagos;
 
 async function findAll(req, res) {
 
     try {
 
-        const data = await Alumno.findAll();
-
+        const data = await Alumno.findAll({
+            include: [
+                {
+                    model: Padre
+                },
+                {
+                    model: Grado
+                },
+                {
+                    model: Pagos
+                }
+            ]
+        });
+        
         res.status(200).send(data);
 
     } catch (error) {
@@ -126,9 +143,69 @@ async function deleteAlumno(req, res) {
 
 }
 
+async function buscarAlumno(req, res) {
+
+    try {
+
+        const texto = req.query.texto || "";
+
+        const alumnos = await Alumno.findAll({
+
+            where: {
+
+                [Op.or]: [
+
+                    {
+                        DNI: {
+                            [Op.like]: `%${texto}%`
+                        }
+                    },
+
+                    {
+                        Nombre: {
+                            [Op.like]: `%${texto}%`
+                        }
+                    },
+
+                    {
+                        Apellido: {
+                            [Op.like]: `%${texto}%`
+                        }
+                    }
+
+                ]
+
+            },
+
+            include: [
+                {
+                    model: Padre
+                },
+                {
+                    model: Grado
+                }
+            ],
+
+            limit: 10
+
+        });
+
+        res.status(200).send(alumnos);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
+}
+
 module.exports = {
     findAll,
     insertAlumno,
     updateAlumno,
-    deleteAlumno
+    deleteAlumno,
+    buscarAlumno
 };

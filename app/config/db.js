@@ -74,4 +74,28 @@ db.alumno.belongsTo(db.grado, {
     foreignKey: 'ID_Grado'
 });
 
+/* ALUMNO -> PAGOS */
+
+db.alumno.hasMany(db.pagos, {
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
+});
+
+/* PADRE -> PAGOS */
+
+db.padre.hasMany(db.pagos, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
+
 module.exports = db;
