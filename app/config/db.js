@@ -1,39 +1,32 @@
 'use strict'
+
 const Sequelize = require('sequelize');
 require('dotenv').config();
+
 const sequelizeInstance = new Sequelize(
-    process.env.DB, 
-    process.env.DB_USER, 
-    process.env.PASSWORD, 
-{
-    host: process.env.HOST,
-    dialect: process.env.DIALECT,
-    port: process.env.MY_SQL_PORT,
-    dialectOptions: {
-        connectTimeout: 10000,
-    },
-    pool: {
-        max: parseInt(process.env.POOL_MAX),
-        min: parseInt(process.env.POOL_MIN),
-        acquire: parseInt(process.env.POOL_ACQUIRE),
-        idle: parseInt(process.env.POOL_IDLE)
+    process.env.DB,
+    process.env.DB_USER,
+    process.env.PASSWORD,
+    {
+        host: process.env.HOST,
+        dialect: process.env.DIALECT,
+        port: process.env.MY_SQL_PORT,
+        dialectOptions: {
+            connectTimeout: 10000,
+        },
+        pool: {
+            max: parseInt(process.env.POOL_MAX),
+            min: parseInt(process.env.POOL_MIN),
+            acquire: parseInt(process.env.POOL_ACQUIRE),
+            idle: parseInt(process.env.POOL_IDLE)
+        }
     }
-});
+);
+
 const db = {};
+
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
-
-db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
-db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
-db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
-db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
-db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
-db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
-db.archivo = require('../models/archivoModels')(sequelizeInstance, Sequelize);
-db.grado.belongsTo(db.clase, {
-    foreignKey: 'ID_Clase'
-});
-
 
 db.alumno = require('../models/alumnoModels')(sequelizeInstance);
 db.clase = require('../models/claseModels')(sequelizeInstance);
@@ -42,7 +35,6 @@ db.maestroGrado = require('../models/maestroGradoModels')(sequelizeInstance);
 db.maestro = require('../models/maestroModels')(sequelizeInstance);
 db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
-db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 
 
 
@@ -58,20 +50,6 @@ db.grado.belongsToMany(db.maestro, {
     through: db.maestroGrado,
     foreignKey: 'ID_Grado',
     otherKey: 'DNI_Maestro'
-});
-
-/* GRADO <-> CLASE */
-
-db.grado.belongsToMany(db.clase, {
-    through: db.gradoClase,
-    foreignKey: 'ID_Grado',
-    otherKey: 'ID_Clase'
-});
-
-db.clase.belongsToMany(db.grado, {
-    through: db.gradoClase,
-    foreignKey: 'ID_Clase',
-    otherKey: 'ID_Grado'
 });
 
 /* PADRE -> ALUMNO */
@@ -96,5 +74,28 @@ db.alumno.belongsTo(db.grado, {
     foreignKey: 'ID_Grado'
 });
 
+/* ALUMNO -> PAGOS */
+
+db.alumno.hasMany(db.pagos, {
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
+});
+
+/* PADRE -> PAGOS */
+
+db.padre.hasMany(db.pagos, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
 
 module.exports = db;

@@ -19,9 +19,6 @@ app.use('/api', claseRoutes);
 //Tabla grado ruta
 const gradoRoutes = require('./routes/gradoRoutes');
 app.use('/api', gradoRoutes);
-// Tabla grado_clase ruta
-const gradoClaseRoutes = require('./routes/gradoClaseRoutes');
-app.use('/api', gradoClaseRoutes);
 //Tabla maestro ruta
 const maestroRoutes = require('./routes/maestroRoutes');
 app.use('/api', maestroRoutes);
@@ -31,9 +28,8 @@ app.use('/api', padreRoutes);
 //Tabla pagos ruta
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
-// Tabla archivo ruta
-const archivoRoutes = require('./routes/archivoRoutes');
-app.use('/api', archivoRoutes);
-
+//Tabla estado de cuenta ruta
+const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
+app.use('/api', estadoCuentaRoutes);
 
 module.exports = app;
