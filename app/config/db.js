@@ -1,10 +1,12 @@
 'use strict'
+
 const Sequelize = require('sequelize');
 require('dotenv').config();
+
 const sequelizeInstance = new Sequelize(
-    process.env.DB, 
-    process.env.DB_USER, 
-    process.env.PASSWORD, 
+    process.env.DB,
+    process.env.DB_USER,
+    process.env.PASSWORD,
 {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
@@ -19,16 +21,58 @@ const sequelizeInstance = new Sequelize(
         idle: parseInt(process.env.POOL_IDLE)
     }
 });
+
 const db = {};
+
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
+
+// =======================
+// MODELOS
+// =======================
+
 db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
 db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
+db.calificacion = require('../models/calificacionModels')(sequelizeInstance, Sequelize);
 db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
 db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
 db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
+
+// =======================
+// RELACIÓN CLASE - GRADO
+// =======================
+
+db.clase.hasMany(db.grado, {
+    foreignKey: 'ID_Clase'
+});
+
 db.grado.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
+
+// =======================
+// RELACIÓN ALUMNO - CALIFICACIÓN
+// =======================
+
+db.alumno.hasMany(db.calificacion, {
+    foreignKey: 'DNI_Alumno'
+});
+
+db.calificacion.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno'
+});
+
+// =======================
+// RELACIÓN CLASE - CALIFICACIÓN
+// =======================
+
+db.clase.hasMany(db.calificacion, {
+    foreignKey: 'ID_Clase'
+});
+
+db.calificacion.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
+});
+
 module.exports = db;
