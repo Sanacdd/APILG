@@ -85,10 +85,35 @@ async function updateMaestro(req, res) {
 
 }
 
+async function deleteMaestro(req, res) {
+    try {
+        const filas = await Maestro.destroy({
+            where: {
+                DNI: req.params.id
+            }
+        });
+
+        if (filas === 0) {
+            return res.status(404).send({
+                message: "Maestro no encontrado"
+            });
+        }
+
+        res.status(200).send({
+            message: "Maestro eliminado correctamente"
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message
+        });
+    }
+}
 module.exports = {
 
     findAll,
     insertMaestro,
-    updateMaestro
+    updateMaestro,
+    deleteMaestro
 
 };

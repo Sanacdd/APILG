@@ -1,13 +1,26 @@
 'use strict'
 
+
 const db = require('../config/db');
 const Grado = db.grado;
+const Clase = db.clase;
+
 
 // Obtener todos los grados
 async function findAll(req, res) {
-    Grado.findAll()
-        .then(data => res.status(200).send(data))
-        .catch(error => res.status(400).send(error));
+    Grado.findAll({
+        include: [
+            {
+                model: Clase,
+                attributes: ['ID_Clase', 'Nombre_Clase'],
+                through: {
+                    attributes: []
+                }
+            }
+        ]
+    })
+    .then(data => res.status(200).send(data))
+    .catch(error => res.status(400).send(error));
 }
 
 // Insertar grado

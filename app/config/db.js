@@ -35,7 +35,7 @@ db.maestroGrado = require('../models/maestroGradoModels')(sequelizeInstance);
 db.maestro = require('../models/maestroModels')(sequelizeInstance);
 db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
-
+db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 
 
 /* MAESTRO <-> GRADO*/
@@ -96,6 +96,29 @@ db.padre.hasMany(db.pagos, {
 db.pagos.belongsTo(db.padre, {
     foreignKey: 'DNI_Padre',
     targetKey: 'DNI'
+});
+
+/* GRADO <-> CLASE */
+
+db.grado.belongsToMany(db.clase, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Grado',
+    otherKey: 'ID_Clase'
+});
+
+db.clase.belongsToMany(db.grado, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Clase',
+    otherKey: 'ID_Grado'
+});
+/* GRADO_CLASE -> CLASE */
+
+db.gradoClase.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
+});
+
+db.clase.hasMany(db.gradoClase, {
+    foreignKey: 'ID_Clase'
 });
 
 module.exports = db;
