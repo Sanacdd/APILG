@@ -1,7 +1,9 @@
 'use strict'
 
+
 const Sequelize = require('sequelize');
 require('dotenv').config();
+
 
 const sequelizeInstance = new Sequelize(
     process.env.DB,
@@ -24,6 +26,7 @@ const sequelizeInstance = new Sequelize(
 );
 
 const db = {};
+
 
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
@@ -96,6 +99,31 @@ db.padre.hasMany(db.pagos, {
 db.pagos.belongsTo(db.padre, {
     foreignKey: 'DNI_Padre',
     targetKey: 'DNI'
+});
+
+
+// =======================
+// RELACIÓN ALUMNO - CALIFICACIÓN
+// =======================
+
+db.alumno.hasMany(db.calificacion, {
+    foreignKey: 'DNI_Alumno'
+});
+
+db.calificacion.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno'
+});
+
+// =======================
+// RELACIÓN CLASE - CALIFICACIÓN
+// =======================
+
+db.clase.hasMany(db.calificacion, {
+    foreignKey: 'ID_Clase'
+});
+
+db.calificacion.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
 });
 
 module.exports = db;
