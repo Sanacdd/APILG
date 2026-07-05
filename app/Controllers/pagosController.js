@@ -1,97 +1,182 @@
 'use strict'
 
 const db = require('../config/db');
+
 const Pagos = db.pagos;
+const Padre = db.padre;
+const Alumno = db.alumno;
+
+const estadoCuentaService = require('../Service/estadoCuentaService');
 
 async function findAll(req, res) {
-  try {
-    const data = await Pagos.findAll();
-    res.status(200).send(data);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+
+    try {
+
+    const data = await Pagos.findAll({
+        include: [
+            {
+                model: Padre
+            },
+            {
+                model: Alumno
+            }
+        ]
+    });
+    
+        res.status(200).send(data);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
 }
 
 async function insertPago(req, res) {
-  try {
-    const pagoInsert = req.body;
 
-    const data = await Pagos.create({
-      DNI_Padre: pagoInsert.DNI_Padre,
-      DNI_Alumno: pagoInsert.DNI_Alumno,
-      Fecha_Pago: pagoInsert.Fecha_Pago,
-      Monto: pagoInsert.Monto,
-      Metodo_Pago: pagoInsert.Metodo_Pago,
-      Mes_Correspondiente: pagoInsert.Mes_Correspondiente,
-      Anio_Correspondiente: pagoInsert.Anio_Correspondiente,
-      Numero_Referencia: pagoInsert.Numero_Referencia,
-      Comprobante: pagoInsert.Comprobante
-    });
+    try {
 
-    res.status(200).send(data);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+        const estadoCuenta = await estadoCuentaService.obtenerEstadoCuenta(
+            req.body.DNI_Padre,
+            new Date().getFullYear()
+        );
+
+        const alumno = estadoCuenta.alumnos.find(
+            a => a.DNI === req.body.DNI_Alumno
+        );
+
+        if (!alumno) {
+            return res.status(404).send({
+                message: "El alumno no pertenece al padre o no existe."
+            });
+        }
+
+        const siguiente = alumno.estadoCuenta.siguienteMensualidad;
+
+        if (!siguiente) {
+            return res.status(400).send({
+                message: "El alumno ya tiene todas las mensualidades registradas."
+            });
+        }
+
+        const referenciaExiste = await Pagos.findOne({
+            where: {
+                Numero_Referencia: req.body.Numero_Referencia
+            }
+        });
+
+        if (referenciaExiste) {
+            return res.status(400).send({
+                message: "Este número de referencia ya fue registrado."
+            });
+        }
+
+        const pago = await Pagos.create({
+
+            DNI_Padre: req.body.DNI_Padre,
+            DNI_Alumno: req.body.DNI_Alumno,
+            Fecha_Pago: req.body.Fecha_Pago,
+
+            Mes_Correspondiente: siguiente.mes,
+            Anio_Correspondiente: siguiente.anio,
+
+            Monto: req.body.Monto,
+            Numero_Referencia: req.body.Numero_Referencia,
+        });
+
+        res.status(201).send(pago);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
 }
 
 async function updatePago(req, res) {
-  try {
-    const pagoUpdate = req.body;
 
-    const [num] = await Pagos.update(pagoUpdate, {
-      where: { ID_Pagos: pagoUpdate.ID_Pagos }
-    });
+    try {
 
-    if (num === 1) {
-      res.status(200).send({ message: "Pago actualizado correctamente" });
-    } else {
-      res.status(400).send({ message: "No se pudo actualizar el pago" });
+        const [rows] = await Pagos.update({
+
+            DNI_Padre: req.body.DNI_Padre,
+            DNI_Alumno: req.body.DNI_Alumno,
+            Fecha_Pago: req.body.Fecha_Pago,
+            Monto: req.body.Monto,
+            Numero_Referencia: req.body.Numero_Referencia,
+        }, {
+
+            where: {
+                ID_Pagos: req.body.ID_Pagos
+            }
+
+        });
+
+        if (rows === 0) {
+
+            return res.status(404).send({
+                message: 'Pago no encontrado'
+            });
+
+        }
+
+        res.status(200).send({
+            message: 'Pago actualizado correctamente'
+        });
+
+    } catch (error) {
+
+        res.status(500).send({
+            message: error.message
+        });
+
     }
-  } catch (error) {
-    res.status(500).send({
-      message: error.message || "Error al actualizar el pago"
-    });
-  }
+
 }
 
 async function deletePago(req, res) {
-  try {
-    const { ID_Pagos } = req.params;
 
-    await Pagos.destroy({
-      where: { ID_Pagos }
-    });
+    try {
 
-    res.status(200).send({
-      message: "Pago eliminado correctamente"
-    });
-  } catch (error) {
-    res.status(400).send(error);
-  }
-}
+        const filas = await Pagos.destroy({
 
-async function findOne(req, res) {
-  try {
-    const { ID_Pagos } = req.params;
+            where: {
+                ID_Pagos: req.params.id
+            }
 
-    const data = await Pagos.findOne({
-      where: { ID_Pagos }
-    });
+        });
 
-    if (data) {
-      res.status(200).send(data);
-    } else {
-      res.status(404).send({ message: "Pago no encontrado" });
+        if (filas === 0) {
+
+            return res.status(404).send({
+                message: "Pago no encontrado"
+            });
+
+        }
+
+        res.status(200).send({
+            message: "Pago eliminado correctamente"
+        });
+
+    } catch (error) {
+
+        res.status(500).send({
+            message: error.message
+        });
+
     }
-  } catch (error) {
-    res.status(500).send(error);
-  }
+
 }
 
 module.exports = {
-  findAll,
-  findOne,
-  insertPago,
-  updatePago,
-  deletePago
-}
+    findAll,
+    insertPago,
+    updatePago,
+    deletePago
+};

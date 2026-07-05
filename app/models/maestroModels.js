@@ -1,17 +1,14 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const attributes = {
-      ID_Maestro: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
 
-      ID_Grado: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
+  const Maestro = sequelize.define('Maestro', {
+
+    DNI: {
+      type: DataTypes.CHAR(13),
+      primaryKey: true,
+      allowNull: false,
+    },
 
     Nombre: {
       type: DataTypes.STRING(50),
@@ -31,10 +28,9 @@ module.exports = (sequelize) => {
     Correo: {
       type: DataTypes.STRING(100),
       allowNull: true,
-    },
-  };
+    }
 
-  const Maestro = sequelize.define('Maestro', attributes, {
+  }, {
     tableName: 'maestro',
     timestamps: false,
   });
