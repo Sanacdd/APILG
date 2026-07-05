@@ -1,13 +1,37 @@
-'use strict'
+'use strict';
+
 const express = require('express');
+const isAuth = require('../middlewares/auth');
+const role = require('../middlewares/role');
 const alumnoController = require('../Controllers/alumnoController');
 
 const apiRoutes = express.Router();
 
-apiRoutes
-  .get('/alumnos', async (req, res) => await alumnoController.findAll(req, res))
-  .post('/insertAlumno', alumnoController.insertAlumno)
-  .put('/updateAlumno', alumnoController.updateAlumno)
-  .delete('/deleteAlumno/:id', alumnoController.deleteAlumno);
+apiRoutes.get(
+    '/alumnos',
+    isAuth,
+    alumnoController.findAll
+);
+
+apiRoutes.post(
+    '/insertAlumno',
+    isAuth,
+    role.isAdmin,
+    alumnoController.insertAlumno
+);
+
+apiRoutes.put(
+    '/updateAlumno',
+    isAuth,
+    role.isAdmin,
+    alumnoController.updateAlumno
+);
+
+apiRoutes.delete(
+    '/deleteAlumno/:id',
+    isAuth,
+    role.isAdmin,
+    alumnoController.deleteAlumno
+);
 
 module.exports = apiRoutes;

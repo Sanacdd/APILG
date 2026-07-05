@@ -14,23 +14,46 @@ async function findAll(req, res) {
 }
 
 async function insertAlumno(request, response) {
+
   const alumnoInsert = request.body;
 
-  Alumno.create({
-    ID_Grado: alumnoInsert.ID_Grado,
-    Nombre: alumnoInsert.Nombre,
-    Apellido: alumnoInsert.Apellido,
-    Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
-    Direccion: alumnoInsert.Direccion,
-    Genero: alumnoInsert.Genero
-  })
-    .then(data => {
-      response.status(200).send(data);
-    })
-    .catch(error => {
-      response.status(400).send(error);
+  try {
+
+    const existeAlumno = await Alumno.findOne({
+      where: {
+        Nombre: alumnoInsert.Nombre,
+        Apellido: alumnoInsert.Apellido
+      }
     });
+
+    if (existeAlumno) {
+      return response.status(400).send({
+        message: "Ya existe un alumno con ese nombre y apellido"
+      });
+    }
+
+    const nuevoAlumno = await Alumno.create({
+      ID_Grado: alumnoInsert.ID_Grado,
+      Nombre: alumnoInsert.Nombre,
+      Apellido: alumnoInsert.Apellido,
+      Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
+      Direccion: alumnoInsert.Direccion,
+      Genero: alumnoInsert.Genero
+    });
+
+    response.status(200).send(nuevoAlumno);
+
+  } catch (error) {
+
+    response.status(500).send({
+      message: error.message
+    });
+
+  }
+
 }
+
+
 
 async function updateAlumno(request, response) {
   const alumnoUpdate = request.body;

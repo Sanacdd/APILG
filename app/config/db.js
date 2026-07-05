@@ -29,7 +29,15 @@ db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
 db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
 db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
 db.archivo = require('../models/archivoModels')(sequelizeInstance, Sequelize);
+db.usuario = require('../models/usuarioModels')(sequelizeInstance, Sequelize);
 db.grado.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
+});
+db.maestro.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
+});
+
+db.padre.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
 });
 module.exports = db;
