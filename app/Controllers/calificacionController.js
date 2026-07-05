@@ -6,7 +6,9 @@ const Calificacion = db.calificacion;
 const Alumno = db.alumno;
 const Clase = db.clase;
 
+// =========================
 // Obtener todas las calificaciones
+// =========================
 async function findAll(req, res) {
     try {
 
@@ -14,7 +16,7 @@ async function findAll(req, res) {
             include: [
                 {
                     model: Alumno,
-                    attributes: ['ID_Alumno', 'Nombre', 'Apellido']
+                    attributes: ['DNI', 'Nombre', 'Apellido']
                 },
                 {
                     model: Clase,
@@ -30,19 +32,23 @@ async function findAll(req, res) {
     }
 }
 
+// =========================
 // Registrar calificación
+// =========================
 async function insertCalificacion(req, res) {
+
     try {
 
-        const promedio =
-            (parseFloat(req.body.Parcial1) +
-             parseFloat(req.body.Parcial2) +
-             parseFloat(req.body.Parcial3) +
-             parseFloat(req.body.Parcial4)) / 4;
+        const p1 = Number(req.body.Parcial1) || 0;
+        const p2 = Number(req.body.Parcial2) || 0;
+        const p3 = Number(req.body.Parcial3) || 0;
+        const p4 = Number(req.body.Parcial4) || 0;
+
+        const promedio = (p1 + p2 + p3 + p4) / 4;
 
         const calificacion = await Calificacion.create({
 
-            ID_Alumno: req.body.ID_Alumno,
+            DNI_Alumno: req.body.DNI_Alumno,
             ID_Clase: req.body.ID_Clase,
 
             Parcial1: req.body.Parcial1,
@@ -57,23 +63,30 @@ async function insertCalificacion(req, res) {
         res.status(200).send(calificacion);
 
     } catch (error) {
+
         res.status(400).send(error);
+
     }
+
 }
 
+// =========================
 // Actualizar calificación
+// =========================
 async function updateCalificacion(req, res) {
+
     try {
 
-        const promedio =
-            (parseFloat(req.body.Parcial1) +
-             parseFloat(req.body.Parcial2) +
-             parseFloat(req.body.Parcial3) +
-             parseFloat(req.body.Parcial4)) / 4;
+        const p1 = Number(req.body.Parcial1) || 0;
+        const p2 = Number(req.body.Parcial2) || 0;
+        const p3 = Number(req.body.Parcial3) || 0;
+        const p4 = Number(req.body.Parcial4) || 0;
+
+        const promedio = (p1 + p2 + p3 + p4) / 4;
 
         await Calificacion.update({
 
-            ID_Alumno: req.body.ID_Alumno,
+            DNI_Alumno: req.body.DNI_Alumno,
             ID_Clase: req.body.ID_Clase,
 
             Parcial1: req.body.Parcial1,
@@ -92,16 +105,22 @@ async function updateCalificacion(req, res) {
         });
 
         res.status(200).send({
-            message: "Calificación actualizada"
+            message: "Calificación actualizada correctamente"
         });
 
     } catch (error) {
+
         res.status(400).send(error);
+
     }
+
 }
 
+// =========================
 // Eliminar calificación
+// =========================
 async function deleteCalificacion(req, res) {
+
     try {
 
         await Calificacion.destroy({
@@ -113,12 +132,15 @@ async function deleteCalificacion(req, res) {
         });
 
         res.status(200).send({
-            message: "Calificación eliminada"
+            message: "Calificación eliminada correctamente"
         });
 
     } catch (error) {
+
         res.status(400).send(error);
+
     }
+
 }
 
 module.exports = {
