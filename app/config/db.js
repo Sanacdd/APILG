@@ -31,6 +31,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
 
+db.calificacion = require('../models/calificacionModels')(sequelizeInstance);
 db.alumno = require('../models/alumnoModels')(sequelizeInstance);
 db.clase = require('../models/claseModels')(sequelizeInstance);
 db.grado = require('../models/gradoModels')(sequelizeInstance);

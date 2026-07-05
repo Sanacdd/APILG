@@ -2,6 +2,7 @@
 
 const db = require('../config/db');
 const Pagos = db.pagos;
+const { Op } = require("sequelize");
 
 async function findAll(req, res) {
     try {
@@ -18,6 +19,32 @@ async function findAll(req, res) {
 
 async function insertPago(req, res) {
     try {
+        const pagoExistenteMes = await Pagos.findOne({
+            where: {
+                DNI_Alumno: req.body.DNI_Alumno,
+                Mes_Correspondiente: req.body.Mes_Correspondiente,
+                Anio_Correspondiente: req.body.Anio_Correspondiente
+            }
+        });
+
+        if (pagoExistenteMes) {
+            return res.status(400).send({
+                message: "Este alumno ya tiene registrado el pago de ese mes."
+            });
+        }
+
+        const referenciaExistente = await Pagos.findOne({
+            where: {
+                Numero_Referencia: req.body.Numero_Referencia
+            }
+        });
+
+        if (referenciaExistente) {
+            return res.status(400).send({
+                message: "Ese número de referencia ya fue registrado."
+            });
+        }
+
         const pago = await Pagos.create({
             DNI_Padre: req.body.DNI_Padre,
             DNI_Alumno: req.body.DNI_Alumno,
