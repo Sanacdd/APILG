@@ -12,8 +12,8 @@ module.exports = (sequelize) => {
             autoIncrement: true
         },
 
-        ID_Alumno: {
-            type: DataTypes.INTEGER,
+        DNI_Alumno: {
+            type: DataTypes.CHAR(13),
             allowNull: false
         },
 
@@ -23,23 +23,23 @@ module.exports = (sequelize) => {
         },
 
         Parcial1: {
-            type: DataTypes.FLOAT
+            type: DataTypes.DECIMAL(5,2)
         },
 
         Parcial2: {
-            type: DataTypes.FLOAT
+            type: DataTypes.DECIMAL(5,2)
         },
 
         Parcial3: {
-            type: DataTypes.FLOAT
+            type: DataTypes.DECIMAL(5,2)
         },
 
         Parcial4: {
-            type: DataTypes.FLOAT
+            type: DataTypes.DECIMAL(5,2)
         },
 
         Promedio: {
-            type: DataTypes.FLOAT
+            type: DataTypes.DECIMAL(5,2)
         }
 
     };

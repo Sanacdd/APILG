@@ -90,5 +90,7 @@ module.exports = {
 
     findAll,
     insertMaestro,
-    updateMaestro
-}
+    updateMaestro,
+    deleteMaestro
+
+};

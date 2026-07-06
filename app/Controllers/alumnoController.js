@@ -1,93 +1,9 @@
 'use strict'
 
 const db = require('../config/db');
-const Alumno = db.alumno;
-
-async function findAll(req, res) {
-  Alumno.findAll()
-    .then(data => {
-      res.status(200).send(data);
-    })
-    .catch(error => {
-      res.status(400).send(error);
-    });
-}
-
-async function insertAlumno(request, response) {
-  const alumnoInsert = request.body;
-
-  Alumno.create({
-    ID_Grado: alumnoInsert.ID_Grado,
-    Nombre: alumnoInsert.Nombre,
-    Apellido: alumnoInsert.Apellido,
-    Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
-    Direccion: alumnoInsert.Direccion,
-    Genero: alumnoInsert.Genero
-  })
-    .then(data => {
-      response.status(200).send(data);
-    })
-    .catch(error => {
-      response.status(400).send(error);
-    });
-}
-
-async function updateAlumno(request, response) {
-  const alumnoUpdate = request.body;
-
-  Alumno.update(alumnoUpdate, {
-    where: { ID_Alumno: alumnoUpdate.ID_Alumno }
-  })
-    .then(num => {
-      if (num == 1) {
-        response.status(200).send({
-          message: "Alumno actualizado correctamente"
-        });
-      } else {
-        response.status(400).send({
-          message: "No se pudo actualizar el alumno"
-        });
-      }
-    })
-    .catch(error => {
-      response.status(500).send({
-        message: error.message || "Error al actualizar el alumno"
-      });
-    });
-}
-
-async function deleteAlumno(request, response) {
-  const id = request.params.id;
-
-  Alumno.destroy({
-    where: { ID_Alumno: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        response.status(200).send({
-          message: "Alumno eliminado correctamente"
-        });
-      } else {
-        response.status(400).send({
-          message: "No se pudo eliminar el alumno"
-        });
-      }
-    })
-    .catch(error => {
-      response.status(500).send({
-        message: error.message || "Error al eliminar el alumno"
-      });
-    });
-}
-
-module.exports = {
-  findAll,
-  insertAlumno,
-  updateAlumno,
-  deleteAlumno
-}
 const { Op } = require("sequelize");
 
+const Alumno = db.alumno;
 const Padre = db.padre;
 const Grado = db.grado;
 const Pagos = db.pagos;
@@ -109,7 +25,7 @@ async function findAll(req, res) {
                 }
             ]
         });
-        
+
         res.status(200).send(data);
 
     } catch (error) {
@@ -131,7 +47,6 @@ async function insertAlumno(req, res) {
             DNI: req.body.DNI,
             ID_Grado: req.body.ID_Grado,
             DNI_Padre: req.body.DNI_Padre,
-
             Nombre: req.body.Nombre,
             Apellido: req.body.Apellido,
             Fecha_Nacimiento: req.body.Fecha_Nacimiento,
@@ -160,7 +75,6 @@ async function updateAlumno(req, res) {
 
             ID_Grado: req.body.ID_Grado,
             DNI_Padre: req.body.DNI_Padre,
-
             Nombre: req.body.Nombre,
             Apellido: req.body.Apellido,
             Fecha_Nacimiento: req.body.Fecha_Nacimiento,
@@ -178,13 +92,13 @@ async function updateAlumno(req, res) {
         if (rows === 0) {
 
             return res.status(404).send({
-                message: 'Alumno no encontrado'
+                message: "Alumno no encontrado"
             });
 
         }
 
         res.status(200).send({
-            message: 'Alumno actualizado correctamente'
+            message: "Alumno actualizado correctamente"
         });
 
     } catch (error) {
@@ -202,15 +116,19 @@ async function deleteAlumno(req, res) {
     try {
 
         const filas = await Alumno.destroy({
+
             where: {
                 DNI: req.params.id
             }
+
         });
 
         if (filas === 0) {
+
             return res.status(404).send({
                 message: "Alumno no encontrado"
             });
+
         }
 
         res.status(200).send({
