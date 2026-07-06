@@ -4,44 +4,57 @@ const db = require('../config/db');
 const Maestro = db.maestro;
 
 async function findAll(req, res) {
-    Maestro.findAll()
-        .then(data => {
-            res.status(200).send(data);
-        })
-        .catch(error => {
-            res.status(400).send(error);
+    try {
+        const data = await Maestro.findAll();
+
+        res.status(200).send(data);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
         });
+
+    }
 }
 
-async function insertMaestro(request, response) {
-    const maestroInsert = request.body;
+async function insertMaestro(req, res) {
 
-    Maestro.create({
-        ID_Grado:  maestroInsert.ID_Grado || null,
-        Nombre:    maestroInsert.Nombre,
-        Apellido:  maestroInsert.Apellido,
-        Telefono:  maestroInsert.Telefono || null,
-        Correo:    maestroInsert.Correo || null,
-    })
-    .then(data => {
-        response.status(201).send(data);
-    })
-    .catch(error => {
-        response.status(400).send({ message: error.message || "Error al insertar el maestro" });
-    });
+    try {
+
+        const maestro = await Maestro.create({
+
+            DNI: req.body.DNI,
+            Nombre: req.body.Nombre,
+            Apellido: req.body.Apellido,
+            Telefono: req.body.Telefono || null,
+            Correo: req.body.Correo || null
+
+        });
+
+        res.status(201).send(maestro);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
 }
 
 async function updateMaestro(request, response) {
     const maestroUpdate = request.body;
 
     Maestro.update({
-        ID_Grado:  maestroUpdate.ID_Grado || null,
+        ID_Grado:  maestroUpdate.ID_Grado  || null,
         Nombre:    maestroUpdate.Nombre,
         Apellido:  maestroUpdate.Apellido,
-        Telefono:  maestroUpdate.Telefono || null,
-        Correo:    maestroUpdate.Correo || null,
+        Telefono:  maestroUpdate.Telefono  || null,
+        Correo:    maestroUpdate.Correo    || null,
     }, {
-        where: { ID_Maestro: maestroUpdate.ID_Maestro }
+        where: { ID_Maestro: maestroUpdate.ID_Maestro }  // busca por PK
     })
     .then(num => {
         if (num == 1) {
@@ -74,8 +87,8 @@ async function deleteMaestro(request, response) {
 }
 
 module.exports = {
+
     findAll,
     insertMaestro,
-    updateMaestro,
-    deleteMaestro
+    updateMaestro
 }

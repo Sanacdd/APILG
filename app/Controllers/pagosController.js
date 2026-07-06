@@ -1,125 +1,182 @@
 'use strict'
 
 const db = require('../config/db');
+
 const Pagos = db.pagos;
+const Padre = db.padre;
+const Alumno = db.alumno;
 
+const estadoCuentaService = require('../Service/estadoCuentaService');
 
-//Esta función trae todos los pagos registrados.
-async function findAll(req, res){
-    Pagos.findAll()
-        .then(data => {
-            res.status(200).send(data);
-        })
-        .catch(error => {
-            res.status(400).send(error);
-        });
-}
-//Esta función registra un nuevo pago.
-async function insertPago(request, response){
-    const pagoInsert = request.body;
+async function findAll(req, res) {
 
-    Pagos.create({
-        ID_Padre: pagoInsert.ID_Padre,
-        ID_Alumno: pagoInsert.ID_Alumno,
-        Fecha_Pago: pagoInsert.Fecha_Pago,
-        Monto: pagoInsert.Monto,
-        Metodo_Pago: pagoInsert.Metodo_Pago,
-        Estado: pagoInsert.Estado
-    })
-    .then(data => {
-        response.status(200).send(data);
-    })
-    .catch(error => {
-        response.status(400).send(error);
+    try {
+
+    const data = await Pagos.findAll({
+        include: [
+            {
+                model: Padre
+            },
+            {
+                model: Alumno
+            }
+        ]
     });
-}
-//“La función updatePago permite modificar un registro existente, identificándolo por su llave primaria ID_Pagos.”
-async function updatePago(request, response){
-    const pagoUpdate = request.body;
+    
+        res.status(200).send(data);
 
-    Pagos.update(pagoUpdate, {
-        where: { ID_Pagos: pagoUpdate.ID_Pagos }
-    })
-    .then(num => {
-        if(num == 1){
-            response.status(200).send({
-                message: "Pago actualizado correctamente"
-            });
-        } else {
-            response.status(400).send({
-                message: "No se pudo actualizar el pago"
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
+}
+
+async function insertPago(req, res) {
+
+    try {
+
+        const estadoCuenta = await estadoCuentaService.obtenerEstadoCuenta(
+            req.body.DNI_Padre,
+            new Date().getFullYear()
+        );
+
+        const alumno = estadoCuenta.alumnos.find(
+            a => a.DNI === req.body.DNI_Alumno
+        );
+
+        if (!alumno) {
+            return res.status(404).send({
+                message: "El alumno no pertenece al padre o no existe."
             });
         }
-    })
-    .catch(error => {
-        response.status(500).send({
-            message: error.message || "Error al actualizar el pago"
-        });
-    });
-}
-//Esta función elimina un pago.
-async function deletePago(req, res){
-    const { ID_Pagos } = req.params;
 
-    Pagos.destroy({
-        where: { ID_Pagos: ID_Pagos }
-    })
-    .then(() => {
+        const siguiente = alumno.estadoCuenta.siguienteMensualidad;
+
+        if (!siguiente) {
+            return res.status(400).send({
+                message: "El alumno ya tiene todas las mensualidades registradas."
+            });
+        }
+
+        const referenciaExiste = await Pagos.findOne({
+            where: {
+                Numero_Referencia: req.body.Numero_Referencia
+            }
+        });
+
+        if (referenciaExiste) {
+            return res.status(400).send({
+                message: "Este número de referencia ya fue registrado."
+            });
+        }
+
+        const pago = await Pagos.create({
+
+            DNI_Padre: req.body.DNI_Padre,
+            DNI_Alumno: req.body.DNI_Alumno,
+            Fecha_Pago: req.body.Fecha_Pago,
+
+            Mes_Correspondiente: siguiente.mes,
+            Anio_Correspondiente: siguiente.anio,
+
+            Monto: req.body.Monto,
+            Numero_Referencia: req.body.Numero_Referencia,
+        });
+
+        res.status(201).send(pago);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
+}
+
+async function updatePago(req, res) {
+
+    try {
+
+        const [rows] = await Pagos.update({
+
+            DNI_Padre: req.body.DNI_Padre,
+            DNI_Alumno: req.body.DNI_Alumno,
+            Fecha_Pago: req.body.Fecha_Pago,
+            Monto: req.body.Monto,
+            Numero_Referencia: req.body.Numero_Referencia,
+        }, {
+
+            where: {
+                ID_Pagos: req.body.ID_Pagos
+            }
+
+        });
+
+        if (rows === 0) {
+
+            return res.status(404).send({
+                message: 'Pago no encontrado'
+            });
+
+        }
+
+        res.status(200).send({
+            message: 'Pago actualizado correctamente'
+        });
+
+    } catch (error) {
+
+        res.status(500).send({
+            message: error.message
+        });
+
+    }
+
+}
+
+async function deletePago(req, res) {
+
+    try {
+
+        const filas = await Pagos.destroy({
+
+            where: {
+                ID_Pagos: req.params.id
+            }
+
+        });
+
+        if (filas === 0) {
+
+            return res.status(404).send({
+                message: "Pago no encontrado"
+            });
+
+        }
+
         res.status(200).send({
             message: "Pago eliminado correctamente"
         });
-    })
-    .catch(error => {
-        res.status(400).send(error);
-    });
 
-//Esta función busca un solo pago por su ID.
+    } catch (error) {
 
-async function findOne(req, res){
-    const { ID_Pagos } = req.params;
+        res.status(500).send({
+            message: error.message
+        });
 
-    Pagos.findOne({
-        where: { ID_Pagos: ID_Pagos }
-    })
-    .then(data => {
-        if(data){
-            res.status(200).send(data);
-        } else {
-            res.status(404).send({
-                message: "Pago no encontrado"
-            });
-        }
-    })
-    .catch(error => {
-        res.status(400).send(error);
-    });
-}
-
+    }
 
 }
-async function findOne(req, res) {
-    const { ID_Pagos } = req.params;
 
-    Pagos.findOne({
-        where: { ID_Pagos: ID_Pagos }
-    })
-    .then(data => {
-        if (data) {
-            res.status(200).send(data);
-        } else {
-            res.status(404).send({
-                message: "Pago no encontrado"
-            });
-        }
-    })
-    .catch(error => {
-        res.status(500).send(error);
-    });
-}
 module.exports = {
     findAll,
-    findOne,
     insertPago,
     updatePago,
     deletePago
-}
+};

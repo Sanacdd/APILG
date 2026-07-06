@@ -4,9 +4,9 @@ const Sequelize = require('sequelize');
 require('dotenv').config();
 
 const sequelizeInstance = new Sequelize(
-    process.env.DB,
-    process.env.DB_USER,
-    process.env.PASSWORD,
+    process.env.DB, 
+    process.env.DB_USER, 
+    process.env.PASSWORD, 
 {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
@@ -34,21 +34,60 @@ db.sequelizeInstance = sequelizeInstance;
 db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
 db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
-db.calificacion = require('../models/calificacionModels')(sequelizeInstance, Sequelize);
 db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
 db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
 db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
 
-// =======================
-// RELACIÓN CLASE - GRADO
-// =======================
-
-db.clase.hasMany(db.grado, {
-    foreignKey: 'ID_Clase'
+db.grado.belongsToMany(db.maestro, {
+    through: db.maestroGrado,
+    foreignKey: 'ID_Grado',
+    otherKey: 'DNI_Maestro'
 });
 
-db.grado.belongsTo(db.clase, {
-    foreignKey: 'ID_Clase'
+/* PADRE -> ALUMNO */
+
+db.padre.hasMany(db.alumno, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.alumno.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
+
+/* GRADO -> ALUMNO */
+
+db.grado.hasMany(db.alumno, {
+    foreignKey: 'ID_Grado'
+});
+
+db.alumno.belongsTo(db.grado, {
+    foreignKey: 'ID_Grado'
+});
+
+/* ALUMNO -> PAGOS */
+
+db.alumno.hasMany(db.pagos, {
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
+});
+
+/* PADRE -> PAGOS */
+
+db.padre.hasMany(db.pagos, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
 });
 
 // =======================

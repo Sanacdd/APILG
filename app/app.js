@@ -41,5 +41,8 @@ app.use('/api', padreRoutes);
 // Pagos
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
+//Tabla estado de cuenta ruta
+const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
+app.use('/api', estadoCuentaRoutes);
 
 module.exports = app;
