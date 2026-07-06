@@ -1,9 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-
   const Pagos = sequelize.define('Pagos', {
-
     ID_Pagos: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -12,16 +10,26 @@ module.exports = (sequelize) => {
 
     DNI_Padre: {
       type: DataTypes.CHAR(13),
-      allowNull: true,
+      allowNull: false,
     },
 
     DNI_Alumno: {
       type: DataTypes.CHAR(13),
-      allowNull: true,
+      allowNull: false,
     },
 
     Fecha_Pago: {
       type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+
+    Monto: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    Metodo_Pago: {
+      type: DataTypes.STRING(30),
       allowNull: false,
     },
 
@@ -35,13 +43,13 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
-    Monto: {
-      type: DataTypes.DECIMAL(10, 2),
+    Numero_Referencia: {
+      type: DataTypes.STRING(30),
       allowNull: false,
     },
 
-    Numero_Referencia: {
-      type: DataTypes.STRING(30),
+    Comprobante: {
+      type: DataTypes.STRING(500),
       allowNull: false,
     },
 
@@ -51,5 +59,4 @@ module.exports = (sequelize) => {
   });
 
   return Pagos;
-
 };

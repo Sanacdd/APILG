@@ -28,6 +28,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
 
+db.calificacion = require('../models/calificacionModels')(sequelizeInstance);
 db.alumno = require('../models/alumnoModels')(sequelizeInstance);
 db.clase = require('../models/claseModels')(sequelizeInstance);
 db.grado = require('../models/gradoModels')(sequelizeInstance);
@@ -37,8 +38,7 @@ db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
 db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 
-
-/* MAESTRO <-> GRADO*/
+/* MAESTRO <-> GRADO */
 
 db.maestro.belongsToMany(db.grado, {
     through: db.maestroGrado,
@@ -111,6 +111,7 @@ db.clase.belongsToMany(db.grado, {
     foreignKey: 'ID_Clase',
     otherKey: 'ID_Grado'
 });
+
 /* GRADO_CLASE -> CLASE */
 
 db.gradoClase.belongsTo(db.clase, {
@@ -118,6 +119,26 @@ db.gradoClase.belongsTo(db.clase, {
 });
 
 db.clase.hasMany(db.gradoClase, {
+    foreignKey: 'ID_Clase'
+});
+
+/* ALUMNO -> CALIFICACIÓN */
+
+db.alumno.hasMany(db.calificacion, {
+    foreignKey: 'DNI_Alumno'
+});
+
+db.calificacion.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno'
+});
+
+/* CLASE -> CALIFICACIÓN */
+
+db.clase.hasMany(db.calificacion, {
+    foreignKey: 'ID_Clase'
+});
+
+db.calificacion.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
 
