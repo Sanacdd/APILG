@@ -1,6 +1,8 @@
 'use strict'
+
 const Sequelize = require('sequelize');
 require('dotenv').config();
+
 const sequelizeInstance = new Sequelize(
     process.env.DB, 
     process.env.DB_USER, 
@@ -19,16 +21,102 @@ const sequelizeInstance = new Sequelize(
         idle: parseInt(process.env.POOL_IDLE)
     }
 });
+
 const db = {};
+
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
+
+// =======================
+// MODELOS
+// =======================
+
 db.alumno = require('../models/alumnoModels')(sequelizeInstance, Sequelize);
 db.clase = require('../models/claseModels')(sequelizeInstance, Sequelize);
 db.grado = require('../models/gradoModels')(sequelizeInstance, Sequelize);
 db.maestro = require('../models/maestroModels')(sequelizeInstance, Sequelize);
 db.padre = require('../models/padreModels')(sequelizeInstance, Sequelize);
 db.pagos = require('../models/pagosModels')(sequelizeInstance, Sequelize);
-db.grado.belongsTo(db.clase, {
+
+db.calificacion = require('../models/calificacionModels')(sequelizeInstance, Sequelize);
+db.maestroGrado = require('../models/maestrogradoModels')(sequelizeInstance, Sequelize);
+
+db.grado.belongsToMany(db.maestro, {
+    through: db.maestroGrado,
+    foreignKey: 'ID_Grado',
+    otherKey: 'DNI_Maestro'
+});
+
+/* PADRE -> ALUMNO */
+
+db.padre.hasMany(db.alumno, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.alumno.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
+
+/* GRADO -> ALUMNO */
+
+db.grado.hasMany(db.alumno, {
+    foreignKey: 'ID_Grado'
+});
+
+db.alumno.belongsTo(db.grado, {
+    foreignKey: 'ID_Grado'
+});
+
+/* ALUMNO -> PAGOS */
+
+db.alumno.hasMany(db.pagos, {
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
+});
+
+/* PADRE -> PAGOS */
+
+db.padre.hasMany(db.pagos, {
+    foreignKey: 'DNI_Padre',
+    sourceKey: 'DNI'
+});
+
+db.pagos.belongsTo(db.padre, {
+    foreignKey: 'DNI_Padre',
+    targetKey: 'DNI'
+});
+
+// =======================
+// RELACIÓN ALUMNO - CALIFICACIÓN
+// =======================
+
+db.alumno.hasMany(db.calificacion, {
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
+});
+
+db.calificacion.belongsTo(db.alumno, {
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
+});
+
+// =======================
+// RELACIÓN CLASE - CALIFICACIÓN
+// =======================
+
+db.clase.hasMany(db.calificacion, {
     foreignKey: 'ID_Clase'
 });
+
+db.calificacion.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
+});
+
 module.exports = db;

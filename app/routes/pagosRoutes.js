@@ -5,11 +5,10 @@ const pagosController = require('../Controllers/pagosController');//Aquí se def
 const apiRoutes = express.Router();//Se crea un enrutador de Express para manejar las rutas relacionadas con los pagos.
 
 apiRoutes
-  .get('/pagos', async (req, res) => await pagosController.findAll(req, res)) //este endponint permite consultar todos los pagos registrados en la base de datos.
-  .get('/pagos/:ID_Pagos', pagosController.findOne)//este endpoint permite consultar un pago específico utilizando su ID_Pagos como parámetro.
-  .post('/insertPago', pagosController.insertPago)//este endpoint permite registrar un nuevo pago en la BD
-  .put('/updatePago', pagosController.updatePago)//este endpoint permite actualizar un pago existente, identificándolo por su ID_Pagos.
-  .delete('/deletePago/:ID_Pagos', pagosController.deletePago);//este endpoint permite eliminar un pago
-  
+.get('/pagos', async (req, res) => await
+pagosController.findAll(req, res))
+.post('/insertPago', pagosController.insertPago)
+.put('/updatePago', pagosController.updatePago)
+.delete('/deletePago/:id', pagosController.deletePago);
 
 module.exports = apiRoutes;//Exporta las rutas de pagos para que otros archivos las puedan usar

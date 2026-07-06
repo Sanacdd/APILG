@@ -1,11 +1,13 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const attributes = {
-    ID_Alumno: {
-      type: DataTypes.INTEGER,
+
+  const Alumno = sequelize.define('Alumno', {
+
+    DNI: {
+      type: DataTypes.CHAR(13),
       primaryKey: true,
-      autoIncrement: true,
+      allowNull: false,
     },
 
     ID_Grado: {
@@ -13,10 +15,9 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
-    Identidad: {
-      type: DataTypes.STRING(13),
+    DNI_Padre: {
+      type: DataTypes.CHAR(13),
       allowNull: false,
-      unique: true,
     },
 
     Nombre: {
@@ -43,9 +44,8 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(10),
       allowNull: true,
     },
-  };
 
-  const Alumno = sequelize.define('Alumno', attributes, {
+  }, {
     tableName: 'alumno',
     timestamps: false,
   });
