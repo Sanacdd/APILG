@@ -2,12 +2,31 @@
 
 const db = require('../config/db');
 const Grado = db.grado;
+const Clase = db.clase;
+const Maestro = db.maestro;
 
 // Obtener todos los grados
 async function findAll(req, res) {
-    Grado.findAll()
-        .then(data => res.status(200).send(data))
-        .catch(error => res.status(400).send(error));
+    Grado.findAll({
+        include: [
+            {
+                model: Clase,
+                attributes: ['ID_Clase', 'Nombre_Clase'],
+                through: {
+                    attributes: []
+                }
+            },
+            {
+                model: Maestro,
+                attributes: ['DNI', 'Nombre', 'Apellido'],
+                through: {
+                    attributes: []
+                }
+            }
+        ]
+    })
+    .then(data => res.status(200).send(data))
+    .catch(error => res.status(400).send(error));
 }
 
 // Insertar grado
@@ -34,13 +53,13 @@ async function insertGrado(req, res) {
         Anio: g.Anio || null,
     })
     .then(data => res.status(201).send(data))
-        .catch(error => {
-            console.error(error);
-            res.status(400).json({
-                mensaje: error.message,
-                error
-            });
+    .catch(error => {
+        console.error(error);
+        res.status(400).json({
+            mensaje: error.message,
+            error
         });
+    });
 }
 
 // Actualizar grado

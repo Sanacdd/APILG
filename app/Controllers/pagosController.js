@@ -12,17 +12,8 @@ async function findAll(req, res) {
 
     try {
 
-    const data = await Pagos.findAll({
-        include: [
-            {
-                model: Padre
-            },
-            {
-                model: Alumno
-            }
-        ]
-    });
-    
+        const data = await Pagos.findAll();
+
         res.status(200).send(data);
 
     } catch (error) {
@@ -39,39 +30,40 @@ async function insertPago(req, res) {
 
     try {
 
-        const estadoCuenta = await estadoCuentaService.obtenerEstadoCuenta(
-            req.body.DNI_Padre,
-            new Date().getFullYear()
-        );
+        const pagoExistenteMes = await Pagos.findOne({
 
-        const alumno = estadoCuenta.alumnos.find(
-            a => a.DNI === req.body.DNI_Alumno
-        );
+            where: {
 
-        if (!alumno) {
-            return res.status(404).send({
-                message: "El alumno no pertenece al padre o no existe."
-            });
-        }
+                DNI_Alumno: req.body.DNI_Alumno,
+                Mes_Correspondiente: req.body.Mes_Correspondiente,
+                Anio_Correspondiente: req.body.Anio_Correspondiente
 
-        const siguiente = alumno.estadoCuenta.siguienteMensualidad;
+            }
 
-        if (!siguiente) {
+        });
+
+        if (pagoExistenteMes) {
+
             return res.status(400).send({
-                message: "El alumno ya tiene todas las mensualidades registradas."
+                message: "Este alumno ya tiene registrado el pago de ese mes."
             });
+
         }
 
-        const referenciaExiste = await Pagos.findOne({
+        const referenciaExistente = await Pagos.findOne({
+
             where: {
                 Numero_Referencia: req.body.Numero_Referencia
             }
+
         });
 
-        if (referenciaExiste) {
+        if (referenciaExistente) {
+
             return res.status(400).send({
-                message: "Este número de referencia ya fue registrado."
+                message: "Ese número de referencia ya fue registrado."
             });
+
         }
 
         const pago = await Pagos.create({
@@ -79,12 +71,13 @@ async function insertPago(req, res) {
             DNI_Padre: req.body.DNI_Padre,
             DNI_Alumno: req.body.DNI_Alumno,
             Fecha_Pago: req.body.Fecha_Pago,
-
-            Mes_Correspondiente: siguiente.mes,
-            Anio_Correspondiente: siguiente.anio,
-
             Monto: req.body.Monto,
+            Metodo_Pago: req.body.Metodo_Pago,
+            Mes_Correspondiente: req.body.Mes_Correspondiente,
+            Anio_Correspondiente: req.body.Anio_Correspondiente,
             Numero_Referencia: req.body.Numero_Referencia,
+            Comprobante: req.body.Comprobante
+
         });
 
         res.status(201).send(pago);
@@ -109,7 +102,12 @@ async function updatePago(req, res) {
             DNI_Alumno: req.body.DNI_Alumno,
             Fecha_Pago: req.body.Fecha_Pago,
             Monto: req.body.Monto,
+            Metodo_Pago: req.body.Metodo_Pago,
+            Mes_Correspondiente: req.body.Mes_Correspondiente,
+            Anio_Correspondiente: req.body.Anio_Correspondiente,
             Numero_Referencia: req.body.Numero_Referencia,
+            Comprobante: req.body.Comprobante
+
         }, {
 
             where: {
@@ -144,7 +142,7 @@ async function deletePago(req, res) {
 
     try {
 
-        const filas = await Pagos.destroy({
+        const rows = await Pagos.destroy({
 
             where: {
                 ID_Pagos: req.params.id
@@ -152,22 +150,22 @@ async function deletePago(req, res) {
 
         });
 
-        if (filas === 0) {
+        if (rows === 0) {
 
             return res.status(404).send({
-                message: "Pago no encontrado"
+                message: 'Pago no encontrado'
             });
 
         }
 
         res.status(200).send({
-            message: "Pago eliminado correctamente"
+            message: 'Pago eliminado correctamente'
         });
 
     } catch (error) {
 
         res.status(500).send({
-            message: error.message
+            message: 'No se puede eliminar el pago porque tiene registros asociados'
         });
 
     }
@@ -175,8 +173,10 @@ async function deletePago(req, res) {
 }
 
 module.exports = {
+
     findAll,
     insertPago,
     updatePago,
     deletePago
+
 };

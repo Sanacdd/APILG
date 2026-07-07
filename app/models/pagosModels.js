@@ -14,12 +14,12 @@ module.exports = (sequelize) => {
 
     DNI_Padre: {
       type: DataTypes.CHAR(13),
-      allowNull: true,
+      allowNull: false,
     },
 
     DNI_Alumno: {
       type: DataTypes.CHAR(13),
-      allowNull: true,
+      allowNull: false,
     },
 
     Fecha_Pago: {
@@ -38,7 +38,7 @@ module.exports = (sequelize) => {
     },
 
     Monto: {
-      type: DataTypes.DECIMAL(10, 2),
+      type: DataTypes.DECIMAL(10,2),
       allowNull: false,
     },
 
@@ -55,11 +55,18 @@ module.exports = (sequelize) => {
     Comprobante: {
       type: DataTypes.STRING(500),
       allowNull: false,
+    },
+
+    Estado: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
     }
 
   }, {
+
     tableName: 'pagos',
-    timestamps: false,
+    timestamps: false
+
   });
 
   return Pagos;
