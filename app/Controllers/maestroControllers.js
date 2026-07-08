@@ -63,19 +63,19 @@ async function insertMaestro(req, res) {
 async function updateMaestro(req, res) {
 
     try {
+        const dni = req.params.id;
 
-        const [rows] = await Maestro.update({
-
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Telefono: req.body.Telefono || null,
-            Correo: req.body.Correo || null,
-            Cargo: req.body.Cargo
-
-        }, {
-
+        // Primero borrar la relación maestro-grado
+        await db.maestroGrado.destroy({
             where: {
-                DNI: req.body.DNI
+                DNI_Maestro: dni
+            }
+        });
+
+        // Después borrar el maestro
+        const filas = await Maestro.destroy({
+            where: {
+                DNI: dni
             }
 
         });

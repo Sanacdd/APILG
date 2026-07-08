@@ -9,6 +9,7 @@ apiRoutes
 .get('/padres', async (req, res) =>
     await padreController.findAll(req, res)
 )
+.get('/buscarPadre', padreController.buscarPadre)
 .post('/insertPadre', padreController.insertPadre)
 .put('/updatePadre', padreController.updatePadre)
 .delete('/deletePadre/:dni', padreController.deletePadre);
