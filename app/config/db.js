@@ -1,9 +1,7 @@
 'use strict'
 
-
 const Sequelize = require('sequelize');
 require('dotenv').config();
-
 
 const sequelizeInstance = new Sequelize(
     process.env.DB,
@@ -27,22 +25,24 @@ const sequelizeInstance = new Sequelize(
 
 const db = {};
 
-
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
+
+// =======================
+// MODELOS
+// =======================
 
 db.calificacion = require('../models/calificacionModels')(sequelizeInstance);
 db.alumno = require('../models/alumnoModels')(sequelizeInstance);
 db.clase = require('../models/claseModels')(sequelizeInstance);
 db.grado = require('../models/gradoModels')(sequelizeInstance);
-db.maestroGrado = require('../models/maestroGradoModels')(sequelizeInstance);
+db.maestroGrado = require('../models/maestrogradoModels')(sequelizeInstance);
 db.maestro = require('../models/maestroModels')(sequelizeInstance);
 db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
+db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 
-
-
-/* MAESTRO <-> GRADO*/
+/* MAESTRO <-> GRADO */
 
 db.maestro.belongsToMany(db.grado, {
     through: db.maestroGrado,
@@ -102,22 +102,43 @@ db.pagos.belongsTo(db.padre, {
     targetKey: 'DNI'
 });
 
+/* GRADO <-> CLASE */
 
-// =======================
-// RELACIÓN ALUMNO - CALIFICACIÓN
-// =======================
+db.grado.belongsToMany(db.clase, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Grado',
+    otherKey: 'ID_Clase'
+});
+
+db.clase.belongsToMany(db.grado, {
+    through: db.gradoClase,
+    foreignKey: 'ID_Clase',
+    otherKey: 'ID_Grado'
+});
+
+/* GRADO_CLASE -> CLASE */
+
+db.gradoClase.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
+});
+
+db.clase.hasMany(db.gradoClase, {
+    foreignKey: 'ID_Clase'
+});
+
+/* ALUMNO -> CALIFICACIÓN */
 
 db.alumno.hasMany(db.calificacion, {
-    foreignKey: 'DNI_Alumno'
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
 });
 
 db.calificacion.belongsTo(db.alumno, {
-    foreignKey: 'DNI_Alumno'
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
 });
 
-// =======================
-// RELACIÓN CLASE - CALIFICACIÓN
-// =======================
+/* CLASE -> CALIFICACIÓN */
 
 db.clase.hasMany(db.calificacion, {
     foreignKey: 'ID_Clase'
