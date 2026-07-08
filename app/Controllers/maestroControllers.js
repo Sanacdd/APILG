@@ -2,6 +2,7 @@
 
 const db = require('../config/db');
 const Maestro = db.maestro;
+const MaestroGrado = db.maestroGrado;
 
 async function findAll(req, res) {
     try {
@@ -24,14 +25,22 @@ async function insertMaestro(req, res) {
 
         const maestro = await Maestro.create({
 
-            DNI: req.body.DNI,
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Telefono: req.body.Telefono || null,
-            Correo: req.body.Correo || null
+    DNI: req.body.DNI,
+    Nombre: req.body.Nombre,
+    Apellido: req.body.Apellido,
+    Telefono: req.body.Telefono || null,
+    Correo: req.body.Correo || null,
+    Cargo: req.body.Cargo
 
-        });
+});
 
+await MaestroGrado.create({
+
+    DNI_Maestro: req.body.DNI,
+    ID_Grado: req.body.ID_Grado,
+    Titular: false
+
+});
         res.status(201).send(maestro);
 
     } catch (error) {
@@ -48,13 +57,13 @@ async function updateMaestro(request, response) {
     const maestroUpdate = request.body;
 
     Maestro.update({
-        ID_Grado:  maestroUpdate.ID_Grado  || null,
-        Nombre:    maestroUpdate.Nombre,
-        Apellido:  maestroUpdate.Apellido,
-        Telefono:  maestroUpdate.Telefono  || null,
-        Correo:    maestroUpdate.Correo    || null,
+        Nombre: maestroUpdate.Nombre,
+        Apellido: maestroUpdate.Apellido,
+        Telefono: maestroUpdate.Telefono || null,
+        Correo: maestroUpdate.Correo || null,
+        Cargo: maestroUpdate.Cargo
     }, {
-        where: { ID_Maestro: maestroUpdate.ID_Maestro }  // busca por PK
+        where: { DNI: maestroUpdate.DNI }
     })
     .then(num => {
         if (num == 1) {
@@ -72,7 +81,7 @@ async function deleteMaestro(request, response) {
     const id = request.params.id;
 
     Maestro.destroy({
-        where: { ID_Maestro: id }
+        where: { DNI: id }
     })
     .then(num => {
         if (num == 1) {
