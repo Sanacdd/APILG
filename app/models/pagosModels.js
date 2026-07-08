@@ -55,12 +55,7 @@ module.exports = (sequelize) => {
     Comprobante: {
       type: DataTypes.STRING(500),
       allowNull: false,
-    },
-
-    //Estado: {
-    //  type: DataTypes.STRING(20),
-    //  allowNull: true,
-    //}
+    }
 
   }, {
 
