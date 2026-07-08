@@ -90,9 +90,19 @@ async function deleteMaestro(req, res) {
 
 async function deleteMaestro(req, res) {
     try {
+        const dni = req.params.id;
+
+        // Primero borrar la relación maestro-grado
+        await db.maestroGrado.destroy({
+            where: {
+                DNI_Maestro: dni
+            }
+        });
+
+        // Después borrar el maestro
         const filas = await Maestro.destroy({
             where: {
-                DNI: req.params.id
+                DNI: dni
             }
         });
 

@@ -3,6 +3,7 @@
 const db = require('../config/db');
 const Padre = db.padre;
 const Alumno = db.alumno;
+const { Op } = require("sequelize");
 
 async function findAll(req, res) {
 
@@ -131,9 +132,35 @@ async function deletePadre(req, res) {
 
 }
 
+async function buscarPadre(req, res) {
+    try {
+        const texto = req.query.texto || "";
+
+        const padres = await Padre.findAll({
+            where: {
+                [Op.or]: [
+                    { DNI: { [Op.like]: `%${texto}%` } },
+                    { Nombre: { [Op.like]: `%${texto}%` } },
+                    { Apellido: { [Op.like]: `%${texto}%` } }
+                ]
+            },
+            attributes: ["DNI", "Nombre", "Apellido"],
+            limit: 10
+        });
+
+        res.status(200).send(padres);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message
+        });
+    }
+}
+
 module.exports = {
     findAll,
     insertPadre,
     updatePadre,
-    deletePadre
+    deletePadre,
+    buscarPadre
 };
