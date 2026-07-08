@@ -30,11 +30,14 @@ async function findAll(req, res) {
 
     } catch (error) {
 
-        res.status(400).send({
-            message: error.message
-        });
+    console.error("ERROR AL OBTENER ALUMNOS:");
+    console.error(error);
 
-    }
+    res.status(400).send({
+        message: error.message
+    });
+
+}
 
 }
 

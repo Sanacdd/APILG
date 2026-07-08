@@ -57,10 +57,10 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
-    Estado: {
-      type: DataTypes.STRING(20),
-      allowNull: true,
-    }
+    //Estado: {
+    //  type: DataTypes.STRING(20),
+    //  allowNull: true,
+    //}
 
   }, {
 
