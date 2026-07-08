@@ -41,6 +41,11 @@ app.use('/api', padreRoutes);
 // Pagos
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
+
+// Archivo
+const archivoRoutes = require('./routes/archivoRoutes');
+app.use('/api', archivoRoutes);
+
 //Tabla estado de cuenta ruta
 const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
 app.use('/api', estadoCuentaRoutes);

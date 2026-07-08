@@ -28,11 +28,15 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelizeInstance = sequelizeInstance;
 
+// =======================
+// MODELOS
+// =======================
+
 db.calificacion = require('../models/calificacionModels')(sequelizeInstance);
 db.alumno = require('../models/alumnoModels')(sequelizeInstance);
 db.clase = require('../models/claseModels')(sequelizeInstance);
 db.grado = require('../models/gradoModels')(sequelizeInstance);
-db.maestroGrado = require('../models/maestroGradoModels')(sequelizeInstance);
+db.maestroGrado = require('../models/maestrogradoModels')(sequelizeInstance);
 db.maestro = require('../models/maestroModels')(sequelizeInstance);
 db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
@@ -125,11 +129,13 @@ db.clase.hasMany(db.gradoClase, {
 /* ALUMNO -> CALIFICACIÓN */
 
 db.alumno.hasMany(db.calificacion, {
-    foreignKey: 'DNI_Alumno'
+    foreignKey: 'DNI_Alumno',
+    sourceKey: 'DNI'
 });
 
 db.calificacion.belongsTo(db.alumno, {
-    foreignKey: 'DNI_Alumno'
+    foreignKey: 'DNI_Alumno',
+    targetKey: 'DNI'
 });
 
 /* CLASE -> CALIFICACIÓN */

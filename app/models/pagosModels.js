@@ -1,7 +1,11 @@
+'use strict';
+
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
+
   const Pagos = sequelize.define('Pagos', {
+
     ID_Pagos: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -23,16 +27,6 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
-    Monto: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
-
-    Metodo_Pago: {
-      type: DataTypes.STRING(30),
-      allowNull: false,
-    },
-
     Mes_Correspondiente: {
       type: DataTypes.TINYINT,
       allowNull: false,
@@ -43,20 +37,33 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
 
+    Monto: {
+      type: DataTypes.DECIMAL(10,2),
+      allowNull: false,
+    },
+
     Numero_Referencia: {
       type: DataTypes.STRING(30),
       allowNull: false,
     },
 
+    Metodo_Pago: {
+      type: DataTypes.STRING(30),
+      allowNull: true,
+    },
+
     Comprobante: {
       type: DataTypes.STRING(500),
       allowNull: false,
-    },
+    }
 
   }, {
+
     tableName: 'pagos',
-    timestamps: false,
+    timestamps: false
+
   });
 
   return Pagos;
+
 };
