@@ -55,5 +55,8 @@ app.use('/api', gradoClaseRoutes);
 // Tabla maestro_grado ruta
 const maestroGradoRoutes = require('./routes/maestroGradoRoutes');
 app.use('/api', maestroGradoRoutes);
+// Tabla user ruta
+const userRoutes = require('./routes/userRoutes');
+app.use('/api', userRoutes);
 
 module.exports = app;

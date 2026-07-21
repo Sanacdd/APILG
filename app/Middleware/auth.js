@@ -1,6 +1,6 @@
 'use strict'
 
-const service = require('../Services/authService')
+const service = require('../Service/Token');
 
 function isAuth(req, res, next) {
     if (!req.headers.authorization) return res.status(403).

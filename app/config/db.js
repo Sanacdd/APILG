@@ -41,7 +41,7 @@ db.maestro = require('../models/maestroModels')(sequelizeInstance);
 db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
 db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
-
+db.user = require('../models/userModels')(sequelizeInstance);
 /* MAESTRO <-> GRADO */
 
 db.maestro.belongsToMany(db.grado, {
@@ -147,5 +147,6 @@ db.clase.hasMany(db.calificacion, {
 db.calificacion.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
+
 
 module.exports = db;
