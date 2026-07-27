@@ -126,5 +126,11 @@ db.clase.hasMany(db.calificacion, {
 db.calificacion.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
+db.maestro.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
+});
 
+db.padre.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
+});
 module.exports = db;

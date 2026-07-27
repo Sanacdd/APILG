@@ -38,35 +38,47 @@ async function findAll(req, res) {
 
 }
 
-async function insertAlumno(req, res) {
+async function insertAlumno(request, response) {
 
-    try {
+  const alumnoInsert = request.body;
 
-        const alumno = await Alumno.create({
+  try {
 
-            DNI: req.body.DNI,
-            ID_Grado: req.body.ID_Grado,
-            DNI_Padre: req.body.DNI_Padre,
+    const existeAlumno = await Alumno.findOne({
+      where: {
+        Nombre: alumnoInsert.Nombre,
+        Apellido: alumnoInsert.Apellido
+      }
+    });
 
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Fecha_Nacimiento: req.body.Fecha_Nacimiento,
-            Direccion: req.body.Direccion,
-            Genero: req.body.Genero
-
-        });
-
-        res.status(201).send(alumno);
-
-    } catch (error) {
-
-        res.status(400).send({
-            message: error.message
-        });
-
+    if (existeAlumno) {
+      return response.status(400).send({
+        message: "Ya existe un alumno con ese nombre y apellido"
+      });
     }
 
+    const nuevoAlumno = await Alumno.create({
+      ID_Grado: alumnoInsert.ID_Grado,
+      Nombre: alumnoInsert.Nombre,
+      Apellido: alumnoInsert.Apellido,
+      Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
+      Direccion: alumnoInsert.Direccion,
+      Genero: alumnoInsert.Genero
+    });
+
+    response.status(200).send(nuevoAlumno);
+
+  } catch (error) {
+
+    response.status(500).send({
+      message: error.message
+    });
+
+  }
+
 }
+
+
 
 async function updateAlumno(req, res) {
 

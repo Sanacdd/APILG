@@ -5,6 +5,8 @@ const cors = require('cors');
 
 const app = express();
 
+console.log("APP.JS SE CARGÓ");
+
 app.use(cors({ origin: '*' }));
 
 app.use(express.json());
@@ -41,8 +43,16 @@ app.use('/api', padreRoutes);
 // Pagos
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
+
 //Tabla estado de cuenta ruta
 const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
 app.use('/api', estadoCuentaRoutes);
+// Login
+console.log("ANTES DE IMPORTAR AUTH");
+const authRoutes = require('./routes/authRoutes');
+console.log("AUTH IMPORTADAS");
+
+app.use('/api', authRoutes);
+console.log("AUTH REGISTRADAS");
 
 module.exports = app;
