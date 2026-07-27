@@ -39,32 +39,65 @@ async function insertCalificacion(req, res) {
 
     try {
 
-        const p1 = Number(req.body.Parcial1) || 0;
-        const p2 = Number(req.body.Parcial2) || 0;
-        const p3 = Number(req.body.Parcial3) || 0;
-        const p4 = Number(req.body.Parcial4) || 0;
+        // Buscar si ya existe una calificación para ese alumno y esa clase
+        let calificacion = await Calificacion.findOne({
 
-        const promedio = (p1 + p2 + p3 + p4) / 4;
-
-        const calificacion = await Calificacion.create({
-
-            DNI_Alumno: req.body.DNI_Alumno,
-            ID_Clase: req.body.ID_Clase,
-
-            Parcial1: req.body.Parcial1,
-            Parcial2: req.body.Parcial2,
-            Parcial3: req.body.Parcial3,
-            Parcial4: req.body.Parcial4,
-
-            Promedio: promedio
+            where: {
+                DNI_Alumno: req.body.DNI_Alumno,
+                ID_Clase: req.body.ID_Clase
+            }
 
         });
+
+        if (!calificacion) {
+
+            // No existía, se crea con lo que venga (incluyendo null si el
+            // parcial llega vacío desde el frontend)
+            calificacion = await Calificacion.create({
+
+                DNI_Alumno: req.body.DNI_Alumno,
+                ID_Clase: req.body.ID_Clase,
+
+                Parcial1: req.body.Parcial1,
+                Parcial2: req.body.Parcial2,
+                Parcial3: req.body.Parcial3,
+                Parcial4: req.body.Parcial4,
+
+                Promedio: 0
+
+            });
+
+        } else {
+
+            // Ya existía: se sobreescribe SIEMPRE con lo que llega del
+            // frontend, incluyendo null (antes se ignoraba el null y
+            // por eso una nota borrada "regresaba" al guardar)
+            calificacion.Parcial1 = req.body.Parcial1;
+            calificacion.Parcial2 = req.body.Parcial2;
+            calificacion.Parcial3 = req.body.Parcial3;
+            calificacion.Parcial4 = req.body.Parcial4;
+
+        }
+
+        // Los parciales vacíos (null) cuentan como 0 solo para este cálculo
+        // de respaldo; el promedio "real" que ve el usuario se calcula en
+        // el frontend ignorando los vacíos
+        const p1 = Number(calificacion.Parcial1) || 0;
+        const p2 = Number(calificacion.Parcial2) || 0;
+        const p3 = Number(calificacion.Parcial3) || 0;
+        const p4 = Number(calificacion.Parcial4) || 0;
+
+        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
+
+        await calificacion.save();
 
         res.status(200).send(calificacion);
 
     } catch (error) {
 
-        res.status(400).send(error);
+        res.status(400).send({
+            message: error.message
+        });
 
     }
 
@@ -77,32 +110,36 @@ async function updateCalificacion(req, res) {
 
     try {
 
-        const p1 = Number(req.body.Parcial1) || 0;
-        const p2 = Number(req.body.Parcial2) || 0;
-        const p3 = Number(req.body.Parcial3) || 0;
-        const p4 = Number(req.body.Parcial4) || 0;
+        const calificacion = await Calificacion.findByPk(
+            req.body.ID_Calificacion
+        );
 
-        const promedio = (p1 + p2 + p3 + p4) / 4;
+        if (!calificacion) {
 
-        await Calificacion.update({
+            return res.status(404).send({
+                message: "Calificación no encontrada"
+            });
 
-            DNI_Alumno: req.body.DNI_Alumno,
-            ID_Clase: req.body.ID_Clase,
+        }
 
-            Parcial1: req.body.Parcial1,
-            Parcial2: req.body.Parcial2,
-            Parcial3: req.body.Parcial3,
-            Parcial4: req.body.Parcial4,
+        calificacion.DNI_Alumno = req.body.DNI_Alumno;
+        calificacion.ID_Clase = req.body.ID_Clase;
 
-            Promedio: promedio
+        // Igual que en insertCalificacion: se sobreescribe siempre,
+        // sin el "if (!== null)" que impedía borrar una nota
+        calificacion.Parcial1 = req.body.Parcial1;
+        calificacion.Parcial2 = req.body.Parcial2;
+        calificacion.Parcial3 = req.body.Parcial3;
+        calificacion.Parcial4 = req.body.Parcial4;
 
-        }, {
+        const p1 = Number(calificacion.Parcial1) || 0;
+        const p2 = Number(calificacion.Parcial2) || 0;
+        const p3 = Number(calificacion.Parcial3) || 0;
+        const p4 = Number(calificacion.Parcial4) || 0;
 
-            where: {
-                ID_Calificacion: req.body.ID_Calificacion
-            }
+        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
 
-        });
+        await calificacion.save();
 
         res.status(200).send({
             message: "Calificación actualizada correctamente"
@@ -110,7 +147,9 @@ async function updateCalificacion(req, res) {
 
     } catch (error) {
 
-        res.status(400).send(error);
+        res.status(400).send({
+            message: error.message
+        });
 
     }
 

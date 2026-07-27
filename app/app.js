@@ -44,9 +44,22 @@ app.use('/api', padreRoutes);
 const pagosRoutes = require('./routes/pagosRoutes');
 app.use('/api', pagosRoutes);
 
+// Archivo
+const archivoRoutes = require('./routes/archivoRoutes');
+app.use('/api', archivoRoutes);
+
 //Tabla estado de cuenta ruta
 const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
 app.use('/api', estadoCuentaRoutes);
+// Tabla grado_clase ruta
+const gradoClaseRoutes = require('./routes/gradoClaseRoutes');
+app.use('/api', gradoClaseRoutes);
+// Tabla maestro_grado ruta
+const maestroGradoRoutes = require('./routes/maestroGradoRoutes');
+app.use('/api', maestroGradoRoutes);
+// Tabla user ruta
+const userRoutes = require('./routes/userRoutes');
+app.use('/api', userRoutes);
 // Login
 console.log("ANTES DE IMPORTAR AUTH");
 const authRoutes = require('./routes/authRoutes');

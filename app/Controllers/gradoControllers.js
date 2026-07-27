@@ -2,12 +2,31 @@
 
 const db = require('../config/db');
 const Grado = db.grado;
+const Clase = db.clase;
+const Maestro = db.maestro;
 
 // Obtener todos los grados
 async function findAll(req, res) {
-    Grado.findAll()
-        .then(data => res.status(200).send(data))
-        .catch(error => res.status(400).send(error));
+    Grado.findAll({
+        include: [
+            {
+                model: Clase,
+                attributes: ['ID_Clase', 'Nombre_Clase'],
+                through: {
+                    attributes: []
+                }
+            },
+            {
+                model: Maestro,
+                attributes: ['DNI', 'Nombre', 'Apellido'],
+                through: {
+                    attributes: []
+                }
+            }
+        ]
+    })
+    .then(data => res.status(200).send(data))
+    .catch(error => res.status(400).send(error));
 }
 
 // Insertar grado
@@ -34,13 +53,13 @@ async function insertGrado(req, res) {
         Anio: g.Anio || null,
     })
     .then(data => res.status(201).send(data))
-        .catch(error => {
-            console.error(error);
-            res.status(400).json({
-                mensaje: error.message,
-                error
-            });
+    .catch(error => {
+        console.error(error);
+        res.status(400).json({
+            mensaje: error.message,
+            error
         });
+    });
 }
 
 // Actualizar grado
@@ -68,27 +87,43 @@ async function updateGrado(req, res) {
 
 // Eliminar grado
 async function deleteGrado(req, res) {
+  try {
     const id = req.params.id;
 
-    Grado.destroy({
-        where: {
-            ID_Grado: id
-        }
-    })
-    .then(num => {
-        if (num == 1) {
-            res.send("Eliminado");
-        } else {
-            res.send("No encontrado");
-        }
-    })
-    .catch(() => {
-        res.status(500).json({
-            error: "No se puede eliminar el grado porque tiene alumnos o maestros asignados"
-        });
+    const clases = await db.gradoClase.count({
+      where: { ID_Grado: id }
     });
-}
 
+    const maestros = await db.maestroGrado.count({
+      where: { ID_Grado: id }
+    });
+
+    if (clases > 0 || maestros > 0) {
+      return res.status(400).json({
+        message: "No se puede eliminar este grado porque tiene clases asignadas y un docente asignado."
+      });
+    }
+
+    const eliminado = await Grado.destroy({
+      where: { ID_Grado: id }
+    });
+
+    if (eliminado === 0) {
+      return res.status(404).json({
+        message: "Grado no encontrado"
+      });
+    }
+
+    res.status(200).json({
+      message: "Grado eliminado correctamente"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+}
 module.exports = {
     findAll,
     insertGrado,
