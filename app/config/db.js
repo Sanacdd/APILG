@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const Sequelize = require('sequelize');
 require('dotenv').config();
@@ -42,6 +42,11 @@ db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
 db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 db.user = require('../models/userModels')(sequelizeInstance);
+
+// Modelos agregados por Ari
+db.archivo = require('../models/archivoModels')(sequelizeInstance);
+db.usuario = require('../models/usuarioModels')(sequelizeInstance);
+
 /* MAESTRO <-> GRADO */
 
 db.maestro.belongsToMany(db.grado, {
@@ -148,5 +153,18 @@ db.calificacion.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
 
+/* Relaciones agregadas por Ari */
+
+db.grado.belongsTo(db.clase, {
+    foreignKey: 'ID_Clase'
+});
+
+db.maestro.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
+});
+
+db.padre.belongsTo(db.usuario, {
+    foreignKey: 'ID_Usuario'
+});
 
 module.exports = db;

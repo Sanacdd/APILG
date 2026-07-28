@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const express = require('express');
 const cors = require('cors');
@@ -46,17 +46,24 @@ app.use('/api', pagosRoutes);
 const archivoRoutes = require('./routes/archivoRoutes');
 app.use('/api', archivoRoutes);
 
-//Tabla estado de cuenta ruta
+// Estado de cuenta
 const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
 app.use('/api', estadoCuentaRoutes);
-// Tabla grado_clase ruta
+
+// Grado - Clase
 const gradoClaseRoutes = require('./routes/gradoClaseRoutes');
 app.use('/api', gradoClaseRoutes);
-// Tabla maestro_grado ruta
+
+// Maestro - Grado
 const maestroGradoRoutes = require('./routes/maestroGradoRoutes');
 app.use('/api', maestroGradoRoutes);
-// Tabla user ruta
+
+// Usuario
 const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
+
+// Login (Ari)
+const authRoutes = require('./routes/authRoutes');
+app.use('/api', authRoutes);
 
 module.exports = app;
