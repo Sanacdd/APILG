@@ -30,8 +30,39 @@ async function singIn(req, res) {
   var condition = userId ?  { userId: {[Op.eq]: `${userId}` } } : null;
 
   user.findOne({where: condition})
-  .then()
-  .catch()
+  .then(data => {
+    if(!data) {
+      res.status(404).send({message: "Usuario no encontrado"});
+    }
+    else {
+
+      const result = bcrypt.compareSync(req.body['pass'], data['pass']);
+
+      if(result){
+
+        res.status(200).send({
+          message: "Logged In",
+          userId: data['userId'],
+          rolId: data['rolId'],
+          token: tokenService.createToken(data['userId']),
+          passwordResetRequired: data['passwordResetRequired']
+        });
+
+      }else{
+
+        res.status(500).send({
+          message: "Contraseña incorrecta"
+        });
+
+      }
+
+    }
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: err.message
+    });
+  });
 }
 
 module.exports = {
