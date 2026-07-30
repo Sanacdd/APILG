@@ -63,7 +63,5 @@ const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
 
 // Login (Ari)
-const authRoutes = require('./routes/authRoutes');
-app.use('/api', authRoutes);
 
 module.exports = app;

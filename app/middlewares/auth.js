@@ -1,32 +1,38 @@
 'use strict';
 
-const tokenService = require('../services/tokenService');
+const service = require('../Service/Token');
 
-async function isAuth(req, res, next) {
+function isAuth(req, res, next) {
+
+    console.log("HEADERS:");
+    console.log(req.headers);
 
     if (!req.headers.authorization) {
-        return res.status(401).send({
-            message: 'No se envió el token'
+        console.log("NO LLEGÓ AUTHORIZATION");
+        return res.status(403).send({
+            message: "No tienes autorización"
         });
     }
 
-    const token = req.headers.authorization.replace('Bearer ', '');
+    const token = req.headers.authorization.split(" ")[1];
 
-    try {
+    console.log("TOKEN:");
+    console.log(token);
 
-        const usuario = await tokenService.decodeToken(token);
+    service.decodeToken(token)
+        .then(data => {
+            console.log("TOKEN VÁLIDO");
+            req.user = data;
+            next();
+        })
+        .catch(err => {
+            console.log("TOKEN INVÁLIDO");
+            console.log(err);
 
-        req.usuario = usuario;
-
-        next();
-
-    } catch (error) {
-
-        return res.status(error.status || 500).send({
-            message: error.message
+            return res.status(500).send({
+                message: err.message
+            });
         });
-
-    }
 
 }
 

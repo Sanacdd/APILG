@@ -4,6 +4,9 @@ const db = require("../config/db");
 
 const Maestro = db.maestro;
 const MaestroGrado = db.maestroGrado;
+const User = db.user;
+
+const bcrypt = require("bcrypt");
 
 async function findAll(req, res) {
     try {
@@ -14,12 +17,17 @@ async function findAll(req, res) {
 
     } catch (error) {
 
+        console.error("ERROR AL OBTENER MAESTROS:");   
+        console.error(error);                            
+
         res.status(400).send({
             message: error.message
         });
 
     }
 }
+
+
 
 async function insertMaestro(req, res) {
 
@@ -43,6 +51,24 @@ async function insertMaestro(req, res) {
                 DNI_Maestro: req.body.DNI,
                 ID_Grado: req.body.ID_Grado,
                 Titular: false
+
+            });
+
+        }
+
+        // Crear usuario automáticamente
+        const existeUsuario = await User.findByPk(req.body.DNI);
+
+        if (!existeUsuario) {
+
+            const password = await bcrypt.hash("1234", 10);
+
+            await User.create({
+
+                userId: req.body.DNI,
+                pass: password,
+                rolId: 2,
+                passwordResetRequired: true
 
             });
 
@@ -80,7 +106,7 @@ async function updateMaestro(req, res) {
 
         });
 
-        if (rows === 0) {
+       if (filas === 0) {
 
             return res.status(404).send({
                 message: "Maestro no encontrado"

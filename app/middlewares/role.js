@@ -2,19 +2,24 @@
 
 function isAdmin(req, res, next) {
 
-    if (!req.usuario) {
+    if (!req.user) {
+
         return res.status(401).send({
-            message: 'Usuario no autenticado'
+            message: "Usuario no autenticado"
         });
+
     }
 
-    if (req.usuario.Rol !== 'Administrador') {
+    if (req.user.rolId !== 1) {
+
         return res.status(403).send({
-            message: 'Acceso denegado'
+            message: "Acceso denegado"
         });
+
     }
 
     next();
+
 }
 
 module.exports = {
