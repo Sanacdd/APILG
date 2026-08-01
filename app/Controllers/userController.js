@@ -74,16 +74,6 @@ if (!passwordCorrecta) {
 
 }
 
-console.log("LOGIN CORRECTO");
-console.log({
-    userId: usuario.userId,
-    rolId: usuario.rolId,
-    token: tokenService.createToken(
-        usuario.userId,
-        usuario.rolId
-    )
-});
-
 return res.status(200).send({
 
     message: "Logged In",

@@ -115,15 +115,20 @@ async function insertCalificacion(req, res) {
 
         }
 
-        // Los parciales vacíos (null) cuentan como 0 solo para este cálculo
-        // de respaldo; el promedio "real" que ve el usuario se calcula en
-        // el frontend ignorando los vacíos
-        const p1 = Number(calificacion.Parcial1) || 0;
-        const p2 = Number(calificacion.Parcial2) || 0;
-        const p3 = Number(calificacion.Parcial3) || 0;
-        const p4 = Number(calificacion.Parcial4) || 0;
+        // Criterio único: promedio de los parciales no vacíos,
+        // ignorando los que están en null/undefined/vacío.
+        // Si no hay ningún parcial registrado, el promedio es null.
+        const parciales = [
+            calificacion.Parcial1,
+            calificacion.Parcial2,
+            calificacion.Parcial3,
+            calificacion.Parcial4
+        ].filter(p => p !== null && p !== undefined && p !== "")
+         .map(Number);
 
-        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
+        calificacion.Promedio = parciales.length === 0
+            ? null
+            : parciales.reduce((suma, valor) => suma + valor, 0) / parciales.length;
 
         await calificacion.save();
 
@@ -168,12 +173,19 @@ async function updateCalificacion(req, res) {
         calificacion.Parcial3 = req.body.Parcial3;
         calificacion.Parcial4 = req.body.Parcial4;
 
-        const p1 = Number(calificacion.Parcial1) || 0;
-        const p2 = Number(calificacion.Parcial2) || 0;
-        const p3 = Number(calificacion.Parcial3) || 0;
-        const p4 = Number(calificacion.Parcial4) || 0;
+        // Criterio único: promedio de los parciales no vacíos,
+        // ignorando los que están en null/undefined/vacío.
+        const parciales = [
+            calificacion.Parcial1,
+            calificacion.Parcial2,
+            calificacion.Parcial3,
+            calificacion.Parcial4
+        ].filter(p => p !== null && p !== undefined && p !== "")
+         .map(Number);
 
-        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
+        calificacion.Promedio = parciales.length === 0
+            ? null
+            : parciales.reduce((suma, valor) => suma + valor, 0) / parciales.length;
 
         await calificacion.save();
 

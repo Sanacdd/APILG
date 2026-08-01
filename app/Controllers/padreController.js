@@ -146,7 +146,7 @@ async function deletePadre(req, res) {
 
     } catch (error) {
 
-        res.status(500).send({
+        res.status(400).send({
             message: 'No se puede eliminar el padre porque tiene registros asociados'
         });
 

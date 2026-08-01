@@ -4,32 +4,27 @@ const service = require('../Service/Token');
 
 function isAuth(req, res, next) {
 
-    console.log("HEADERS:");
-    console.log(req.headers);
-
     if (!req.headers.authorization) {
-        console.log("NO LLEGÓ AUTHORIZATION");
-        return res.status(403).send({
+        return res.status(401).send({
             message: "No tienes autorización"
         });
     }
 
     const token = req.headers.authorization.split(" ")[1];
 
-    console.log("TOKEN:");
-    console.log(token);
+    if (!token) {
+        return res.status(401).send({
+            message: "Token no válido"
+        });
+    }
 
     service.decodeToken(token)
         .then(data => {
-            console.log("TOKEN VÁLIDO");
             req.user = data;
             next();
         })
         .catch(err => {
-            console.log("TOKEN INVÁLIDO");
-            console.log(err);
-
-            return res.status(500).send({
+            return res.status(err.status || 401).send({
                 message: err.message
             });
         });
