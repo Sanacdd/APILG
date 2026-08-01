@@ -4,6 +4,9 @@ const db = require("../config/db");
 
 const Maestro = db.maestro;
 const MaestroGrado = db.maestroGrado;
+const User = db.user;
+
+const bcrypt = require("bcrypt");
 
 async function findAll(req, res) {
     try {
@@ -14,12 +17,17 @@ async function findAll(req, res) {
 
     } catch (error) {
 
+        console.error("ERROR AL OBTENER MAESTROS:");   
+        console.error(error);                            
+
         res.status(400).send({
             message: error.message
         });
 
     }
 }
+
+
 
 async function insertMaestro(req, res) {
 
@@ -48,6 +56,24 @@ async function insertMaestro(req, res) {
 
         }
 
+        // Crear usuario automáticamente
+        const existeUsuario = await User.findByPk(req.body.DNI);
+
+        if (!existeUsuario) {
+
+            const password = await bcrypt.hash("1234", 10);
+
+            await User.create({
+
+                userId: req.body.DNI,
+                pass: password,
+                rolId: 2,
+                passwordResetRequired: true
+
+            });
+
+        }
+
         res.status(201).send(maestro);
 
     } catch (error) {
@@ -63,24 +89,24 @@ async function insertMaestro(req, res) {
 async function updateMaestro(req, res) {
 
     try {
+        const dni = req.params.id;
 
-        const [rows] = await Maestro.update({
-
-            Nombre: req.body.Nombre,
-            Apellido: req.body.Apellido,
-            Telefono: req.body.Telefono || null,
-            Correo: req.body.Correo || null,
-            Cargo: req.body.Cargo
-
-        }, {
-
+        // Primero borrar la relación maestro-grado
+        await db.maestroGrado.destroy({
             where: {
-                DNI: req.body.DNI
+                DNI_Maestro: dni
+            }
+        });
+
+        // Después borrar el maestro
+        const filas = await Maestro.destroy({
+            where: {
+                DNI: dni
             }
 
         });
 
-        if (rows === 0) {
+       if (filas === 0) {
 
             return res.status(404).send({
                 message: "Maestro no encontrado"

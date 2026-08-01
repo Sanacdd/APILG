@@ -1,10 +1,13 @@
 'use strict'
 
 const db = require('../config/db');
-const Padre = db.padre;
-const Alumno = db.alumno;
 const { Op } = require("sequelize");
 
+const Padre = db.padre;
+const Alumno = db.alumno;
+const User = db.user;
+
+const bcrypt = require('bcrypt');
 async function findAll(req, res) {
 
     try {
@@ -29,7 +32,9 @@ async function findAll(req, res) {
 
 }
 
-async function insertPadre(req, res) {
+   
+
+      async function insertPadre(req, res) {
 
     try {
 
@@ -43,6 +48,23 @@ async function insertPadre(req, res) {
             Direccion: req.body.Direccion || null
 
         });
+
+        const existeUsuario = await User.findByPk(req.body.DNI);
+
+        if (!existeUsuario) {
+
+            const password = await bcrypt.hash("1234", 10);
+
+            await User.create({
+
+                userId: req.body.DNI,
+                pass: password,
+                rolId: 3,
+                passwordResetRequired: true
+
+            });
+
+        }
 
         res.status(201).send(padre);
 

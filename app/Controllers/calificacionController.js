@@ -31,6 +31,42 @@ async function findAll(req, res) {
         res.status(400).send(error);
     }
 }
+async function findByPadre(req, res) {
+    try {
+
+        const alumnos = await Alumno.findAll({
+            where: {
+                DNI_Padre: req.params.dni
+            },
+            attributes: ['DNI']
+        });
+
+        const dnis = alumnos.map(a => a.DNI);
+
+        const data = await Calificacion.findAll({
+            where: {
+                DNI_Alumno: dnis
+            },
+            include: [
+                {
+                    model: Alumno,
+                    attributes: ['DNI', 'Nombre', 'Apellido']
+                },
+                {
+                    model: Clase,
+                    attributes: ['ID_Clase', 'Nombre_Clase']
+                }
+            ]
+        });
+
+        res.status(200).send(data);
+
+    } catch (error) {
+        res.status(400).send({
+            message: error.message
+        });
+    }
+}
 
 // =========================
 // Registrar calificación
@@ -185,6 +221,7 @@ async function deleteCalificacion(req, res) {
 module.exports = {
 
     findAll,
+    findByPadre,
     insertCalificacion,
     updateCalificacion,
     deleteCalificacion
