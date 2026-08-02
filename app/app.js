@@ -1,11 +1,9 @@
-'use strict'
+'use strict';
 
 const express = require('express');
 const cors = require('cors');
 
 const app = express();
-
-console.log("APP.JS SE CARGÓ");
 
 app.use(cors({ origin: '*' }));
 
@@ -48,24 +46,22 @@ app.use('/api', pagosRoutes);
 const archivoRoutes = require('./routes/archivoRoutes');
 app.use('/api', archivoRoutes);
 
-//Tabla estado de cuenta ruta
+// Estado de cuenta
 const estadoCuentaRoutes = require('./routes/estadoCuentaRoutes');
 app.use('/api', estadoCuentaRoutes);
-// Tabla grado_clase ruta
+
+// Grado - Clase
 const gradoClaseRoutes = require('./routes/gradoClaseRoutes');
 app.use('/api', gradoClaseRoutes);
-// Tabla maestro_grado ruta
+
+// Maestro - Grado
 const maestroGradoRoutes = require('./routes/maestroGradoRoutes');
 app.use('/api', maestroGradoRoutes);
-// Tabla user ruta
+
+// Usuario
 const userRoutes = require('./routes/userRoutes');
 app.use('/api', userRoutes);
-// Login
-console.log("ANTES DE IMPORTAR AUTH");
-const authRoutes = require('./routes/authRoutes');
-console.log("AUTH IMPORTADAS");
 
-app.use('/api', authRoutes);
-console.log("AUTH REGISTRADAS");
+// Login (Ari)
 
 module.exports = app;

@@ -27,4 +27,4 @@ async function obtenerEstadoCuenta(req, res) {
 
 module.exports = {
     obtenerEstadoCuenta
-};
+}; 

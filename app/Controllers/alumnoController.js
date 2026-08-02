@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const db = require('../config/db');
 const { Op } = require("sequelize");
@@ -14,15 +14,9 @@ async function findAll(req, res) {
 
         const data = await Alumno.findAll({
             include: [
-                {
-                    model: Padre
-                },
-                {
-                    model: Grado
-                },
-                {
-                    model: Pagos
-                }
+                { model: Padre },
+                { model: Grado },
+                { model: Pagos }
             ]
         });
 
@@ -30,58 +24,58 @@ async function findAll(req, res) {
 
     } catch (error) {
 
-    console.error("ERROR AL OBTENER ALUMNOS:");
-    console.error(error);
+        console.error("ERROR AL OBTENER ALUMNOS:");
+        console.error(error);
 
-    res.status(400).send({
-        message: error.message
-    });
+        res.status(400).send({
+            message: error.message
+        });
 
-}
-
-}
-
-async function insertAlumno(request, response) {
-
-  const alumnoInsert = request.body;
-
-  try {
-
-    const existeAlumno = await Alumno.findOne({
-      where: {
-        Nombre: alumnoInsert.Nombre,
-        Apellido: alumnoInsert.Apellido
-      }
-    });
-
-    if (existeAlumno) {
-      return response.status(400).send({
-        message: "Ya existe un alumno con ese nombre y apellido"
-      });
     }
 
-    const nuevoAlumno = await Alumno.create({
-      ID_Grado: alumnoInsert.ID_Grado,
-      Nombre: alumnoInsert.Nombre,
-      Apellido: alumnoInsert.Apellido,
-      Fecha_Nacimiento: alumnoInsert.Fecha_Nacimiento,
-      Direccion: alumnoInsert.Direccion,
-      Genero: alumnoInsert.Genero
-    });
-
-    response.status(200).send(nuevoAlumno);
-
-  } catch (error) {
-
-    response.status(500).send({
-      message: error.message
-    });
-
-  }
-
 }
 
+async function insertAlumno(req, res) {
 
+    try {
+
+        const existeAlumno = await Alumno.findOne({
+            where: {
+                Nombre: req.body.Nombre,
+                Apellido: req.body.Apellido
+            }
+        });
+
+        if (existeAlumno) {
+            return res.status(400).send({
+                message: "Ya existe un alumno con ese nombre y apellido"
+            });
+        }
+
+        const alumno = await Alumno.create({
+
+            DNI: req.body.DNI,
+            ID_Grado: req.body.ID_Grado,
+            DNI_Padre: req.body.DNI_Padre,
+            Nombre: req.body.Nombre,
+            Apellido: req.body.Apellido,
+            Fecha_Nacimiento: req.body.Fecha_Nacimiento,
+            Direccion: req.body.Direccion,
+            Genero: req.body.Genero
+
+        });
+
+        res.status(201).send(alumno);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
+}
 
 async function updateAlumno(req, res) {
 
@@ -196,12 +190,8 @@ async function buscarAlumno(req, res) {
             },
 
             include: [
-                {
-                    model: Padre
-                },
-                {
-                    model: Grado
-                }
+                { model: Padre },
+                { model: Grado }
             ],
 
             limit: 10

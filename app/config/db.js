@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const Sequelize = require('sequelize');
 require('dotenv').config();
@@ -42,7 +42,11 @@ db.padre = require('../models/padreModels')(sequelizeInstance);
 db.pagos = require('../models/pagosModels')(sequelizeInstance);
 db.gradoClase = require('../models/gradoClaseModels')(sequelizeInstance);
 db.user = require('../models/userModels')(sequelizeInstance);
-/* MAESTRO <-> GRADO */
+db.archivo = require('../models/archivoModels')(sequelizeInstance, Sequelize);
+
+/* =======================
+   MAESTRO <-> GRADO
+======================= */
 
 db.maestro.belongsToMany(db.grado, {
     through: db.maestroGrado,
@@ -56,7 +60,9 @@ db.grado.belongsToMany(db.maestro, {
     otherKey: 'DNI_Maestro'
 });
 
-/* PADRE -> ALUMNO */
+/* =======================
+   PADRE -> ALUMNO
+======================= */
 
 db.padre.hasMany(db.alumno, {
     foreignKey: 'DNI_Padre',
@@ -68,7 +74,9 @@ db.alumno.belongsTo(db.padre, {
     targetKey: 'DNI'
 });
 
-/* GRADO -> ALUMNO */
+/* =======================
+   GRADO -> ALUMNO
+======================= */
 
 db.grado.hasMany(db.alumno, {
     foreignKey: 'ID_Grado'
@@ -78,7 +86,9 @@ db.alumno.belongsTo(db.grado, {
     foreignKey: 'ID_Grado'
 });
 
-/* ALUMNO -> PAGOS */
+/* =======================
+   ALUMNO -> PAGOS
+======================= */
 
 db.alumno.hasMany(db.pagos, {
     foreignKey: 'DNI_Alumno',
@@ -90,7 +100,9 @@ db.pagos.belongsTo(db.alumno, {
     targetKey: 'DNI'
 });
 
-/* PADRE -> PAGOS */
+/* =======================
+   PADRE -> PAGOS
+======================= */
 
 db.padre.hasMany(db.pagos, {
     foreignKey: 'DNI_Padre',
@@ -102,7 +114,9 @@ db.pagos.belongsTo(db.padre, {
     targetKey: 'DNI'
 });
 
-/* GRADO <-> CLASE */
+/* =======================
+   GRADO <-> CLASE
+======================= */
 
 db.grado.belongsToMany(db.clase, {
     through: db.gradoClase,
@@ -116,7 +130,9 @@ db.clase.belongsToMany(db.grado, {
     otherKey: 'ID_Grado'
 });
 
-/* GRADO_CLASE -> CLASE */
+/* =======================
+   GRADO_CLASE -> CLASE
+======================= */
 
 db.gradoClase.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
@@ -126,7 +142,9 @@ db.clase.hasMany(db.gradoClase, {
     foreignKey: 'ID_Clase'
 });
 
-/* ALUMNO -> CALIFICACIÓN */
+/* =======================
+   ALUMNO -> CALIFICACIÓN
+======================= */
 
 db.alumno.hasMany(db.calificacion, {
     foreignKey: 'DNI_Alumno',
@@ -138,7 +156,9 @@ db.calificacion.belongsTo(db.alumno, {
     targetKey: 'DNI'
 });
 
-/* CLASE -> CALIFICACIÓN */
+/* =======================
+   CLASE -> CALIFICACIÓN
+======================= */
 
 db.clase.hasMany(db.calificacion, {
     foreignKey: 'ID_Clase'
@@ -147,11 +167,20 @@ db.clase.hasMany(db.calificacion, {
 db.calificacion.belongsTo(db.clase, {
     foreignKey: 'ID_Clase'
 });
-db.maestro.belongsTo(db.usuario, {
-    foreignKey: 'ID_Usuario'
+
+/* =======================
+   RELACIONES CON USER
+======================= */
+
+db.maestro.belongsTo(db.user, {
+    foreignKey: 'DNI',
+    targetKey: 'userId'
 });
 
-db.padre.belongsTo(db.usuario, {
-    foreignKey: 'ID_Usuario'
+db.padre.belongsTo(db.user, {
+    foreignKey: 'userId',
+    targetKey: 'userId'
 });
+
+
 module.exports = db;

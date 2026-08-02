@@ -3,12 +3,15 @@
 const jwt = require('jwt-simple');
 const moment = require('moment');
 
-function createToken(user) {
+function createToken(userId, rolId) {
 
     const payload = {
-        sub: user,
+
+        sub: userId,
+        rolId: rolId,
         iat: moment().unix(),
-        exp: moment().add(15, 'days').unix(),
+        exp: moment().add(15, 'days').unix()
+
     };
 
     return jwt.encode(payload, process.env.SECRET_TOKEN);
@@ -32,12 +35,12 @@ function decodeToken(token) {
 
             }
 
-            resolve(payload.sub);
+            resolve(payload);
 
         } catch (error) {
 
             reject({
-                status: 500,
+                status: 401,
                 message: 'Token inválido'
             });
 

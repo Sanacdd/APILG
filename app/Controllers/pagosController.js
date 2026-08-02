@@ -8,6 +8,37 @@ const Alumno = db.alumno;
 
 const estadoCuentaService = require('../Service/estadoCuentaService');
 
+async function findByPadre(req, res) {
+
+    try {
+
+        const alumnos = await Alumno.findAll({
+            where: {
+                DNI_Padre: req.params.dni
+            },
+            attributes: ['DNI']
+        });
+
+        const dnis = alumnos.map(a => a.DNI);
+
+        const data = await Pagos.findAll({
+            where: {
+                DNI_Alumno: dnis
+            }
+        });
+
+        res.status(200).send(data);
+
+    } catch (error) {
+
+        res.status(400).send({
+            message: error.message
+        });
+
+    }
+
+}
+
 async function findAll(req, res) {
 
     try {
@@ -175,6 +206,7 @@ async function deletePago(req, res) {
 module.exports = {
 
     findAll,
+    findByPadre,
     insertPago,
     updatePago,
     deletePago

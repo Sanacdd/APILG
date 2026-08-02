@@ -1,40 +1,110 @@
-'use strict'
+'use strict';
 
 const db = require('../config/db');
-const user = db.user;
-const {Op} = require("sequelize");
+const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const tokenService = require('../Service/Token');
 
+const User = db.user;
 
 async function singUp(req, res) {
-  let newPass = undefined;
-  await bcrypt.genSalt(10).then(async salts => {
-    await bcrypt.hash(req.body['pass'], salts)
-      .then(hash => {newPass = hash})
-      .catch(err =>  console.error(err));
-    })
-    user.create({
-        userId: req.body['Id'],
-        pass: newPass,
-        rolId: req.body['rolId'],
-        passwordResetRequired: req.body['passwordResetRequired']
-    })
-    .then(data => {res.status(200).send({data}) })
-    .catch(err => {res.status(500).send({message: 
-      err.message})});    
-}   
+
+    try {
+
+        const password = await bcrypt.hash(req.body.pass, 10);
+
+        const nuevoUsuario = await User.create({
+
+            userId: req.body.Id,
+            pass: password,
+            rolId: req.body.rolId,
+            passwordResetRequired: req.body.passwordResetRequired
+
+        });
+
+        return res.status(201).send({
+            message: "Usuario creado correctamente",
+            data: nuevoUsuario
+        });
+
+    } catch (error) {
+
+        return res.status(500).send({
+            message: error.message
+        });
+
+    }
+
+}
 
 async function singIn(req, res) {
-  const userId = req.body['Id'];
-  var condition = userId ?  { userId: {[Op.eq]: `${userId}` } } : null;
 
-  user.findOne({where: condition})
-  .then()
-  .catch()
+    try {
+
+        const userId = req.body.Id;
+        const password = req.body.pass;
+
+        const usuario = await User.findOne({
+
+            where: {
+                userId: {
+                    [Op.eq]: userId
+                }
+            }
+
+        });
+
+        if (!usuario) {
+
+            return res.status(404).send({
+                message: "Usuario no encontrado"
+            });
+
+        }
+
+        const passwordCorrecta = await bcrypt.compare(
+            password,
+            usuario.pass
+        );
+if (!passwordCorrecta) {
+
+    return res.status(401).send({
+        message: "Contraseña incorrecta"
+    });
+
+}
+
+return res.status(200).send({
+
+    message: "Logged In",
+
+    userId: usuario.userId,
+
+    rolId: usuario.rolId,
+
+    token: tokenService.createToken(
+        usuario.userId,
+        usuario.rolId
+    ),
+
+    passwordResetRequired:
+        usuario.passwordResetRequired
+
+});
+
+    } catch (error) {
+
+        return res.status(500).send({
+            message: error.message
+        });
+
+    }
+
 }
 
 module.exports = {
+
     singUp,
     singIn
-}
+
+};
