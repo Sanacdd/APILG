@@ -66,6 +66,9 @@ async function singIn(req, res) {
             password,
             usuario.pass
         );
+        console.log("PASSWORD RECIBIDA:", password);
+console.log("HASH GUARDADO:", usuario.pass);
+console.log("COINCIDE:", passwordCorrecta);
 if (!passwordCorrecta) {
 
     return res.status(401).send({
