@@ -7,6 +7,7 @@ const apiRoutes = express.Router();
 apiRoutes
 .get('/pagos', async (req, res) => await
 pagosController.findAll(req, res))
+.get('/pagos/padre/:dni', pagosController.findByPadre)
 .post('/insertPago', pagosController.insertPago)
 .put('/updatePago', pagosController.updatePago)
 .delete('/deletePago/:id', pagosController.deletePago);

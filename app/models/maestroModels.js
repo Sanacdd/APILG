@@ -28,6 +28,12 @@ module.exports = (sequelize) => {
     Correo: {
       type: DataTypes.STRING(100),
       allowNull: true,
+    },
+
+    Cargo: {
+      type: DataTypes.ENUM('Docente', 'Administrativo'),
+      allowNull: false,
+      defaultValue: 'Docente',
     }
 
   }, {

@@ -1,9 +1,13 @@
 'use strict'
 
 const db = require('../config/db');
+const { Op } = require("sequelize");
+
 const Padre = db.padre;
 const Alumno = db.alumno;
+const User = db.user;
 
+const bcrypt = require('bcrypt');
 async function findAll(req, res) {
 
     try {
@@ -28,7 +32,9 @@ async function findAll(req, res) {
 
 }
 
-async function insertPadre(req, res) {
+   
+
+      async function insertPadre(req, res) {
 
     try {
 
@@ -42,6 +48,23 @@ async function insertPadre(req, res) {
             Direccion: req.body.Direccion || null
 
         });
+
+        const existeUsuario = await User.findByPk(req.body.DNI);
+
+        if (!existeUsuario) {
+
+            const password = await bcrypt.hash("1234", 10);
+
+            await User.create({
+
+                userId: req.body.DNI,
+                pass: password,
+                rolId: 3,
+                passwordResetRequired: true
+
+            });
+
+        }
 
         res.status(201).send(padre);
 
@@ -123,7 +146,7 @@ async function deletePadre(req, res) {
 
     } catch (error) {
 
-        res.status(500).send({
+        res.status(400).send({
             message: 'No se puede eliminar el padre porque tiene registros asociados'
         });
 
@@ -131,9 +154,35 @@ async function deletePadre(req, res) {
 
 }
 
+async function buscarPadre(req, res) {
+    try {
+        const texto = req.query.texto || "";
+
+        const padres = await Padre.findAll({
+            where: {
+                [Op.or]: [
+                    { DNI: { [Op.like]: `%${texto}%` } },
+                    { Nombre: { [Op.like]: `%${texto}%` } },
+                    { Apellido: { [Op.like]: `%${texto}%` } }
+                ]
+            },
+            attributes: ["DNI", "Nombre", "Apellido"],
+            limit: 10
+        });
+
+        res.status(200).send(padres);
+
+    } catch (error) {
+        res.status(500).send({
+            message: error.message
+        });
+    }
+}
+
 module.exports = {
     findAll,
     insertPadre,
     updatePadre,
-    deletePadre
+    deletePadre,
+    buscarPadre
 };

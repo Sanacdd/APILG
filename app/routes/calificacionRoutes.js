@@ -8,6 +8,8 @@ const apiRoutes = express.Router();
 // Obtener todas las calificaciones
 apiRoutes.get('/calificaciones', calificacionController.findAll);
 
+apiRoutes.get('/calificaciones/padre/:dni', calificacionController.findByPadre);
+
 // Registrar una calificación
 apiRoutes.post('/calificaciones', calificacionController.insertCalificacion);
 

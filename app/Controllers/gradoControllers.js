@@ -87,27 +87,43 @@ async function updateGrado(req, res) {
 
 // Eliminar grado
 async function deleteGrado(req, res) {
+  try {
     const id = req.params.id;
 
-    Grado.destroy({
-        where: {
-            ID_Grado: id
-        }
-    })
-    .then(num => {
-        if (num == 1) {
-            res.send("Eliminado");
-        } else {
-            res.send("No encontrado");
-        }
-    })
-    .catch(() => {
-        res.status(500).json({
-            error: "No se puede eliminar el grado porque tiene alumnos o maestros asignados"
-        });
+    const clases = await db.gradoClase.count({
+      where: { ID_Grado: id }
     });
-}
 
+    const maestros = await db.maestroGrado.count({
+      where: { ID_Grado: id }
+    });
+
+    if (clases > 0 || maestros > 0) {
+      return res.status(400).json({
+        message: "No se puede eliminar este grado porque tiene clases asignadas y un docente asignado."
+      });
+    }
+
+    const eliminado = await Grado.destroy({
+      where: { ID_Grado: id }
+    });
+
+    if (eliminado === 0) {
+      return res.status(404).json({
+        message: "Grado no encontrado"
+      });
+    }
+
+    res.status(200).json({
+      message: "Grado eliminado correctamente"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+}
 module.exports = {
     findAll,
     insertGrado,

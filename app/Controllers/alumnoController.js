@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const db = require('../config/db');
 const { Op } = require("sequelize");
@@ -14,21 +14,18 @@ async function findAll(req, res) {
 
         const data = await Alumno.findAll({
             include: [
-                {
-                    model: Padre
-                },
-                {
-                    model: Grado
-                },
-                {
-                    model: Pagos
-                }
+                { model: Padre },
+                { model: Grado },
+                { model: Pagos }
             ]
         });
 
         res.status(200).send(data);
 
     } catch (error) {
+
+        console.error("ERROR AL OBTENER ALUMNOS:");
+        console.error(error);
 
         res.status(400).send({
             message: error.message
@@ -41,6 +38,19 @@ async function findAll(req, res) {
 async function insertAlumno(req, res) {
 
     try {
+
+        const existeAlumno = await Alumno.findOne({
+            where: {
+                Nombre: req.body.Nombre,
+                Apellido: req.body.Apellido
+            }
+        });
+
+        if (existeAlumno) {
+            return res.status(400).send({
+                message: "Ya existe un alumno con ese nombre y apellido"
+            });
+        }
 
         const alumno = await Alumno.create({
 
@@ -180,12 +190,8 @@ async function buscarAlumno(req, res) {
             },
 
             include: [
-                {
-                    model: Padre
-                },
-                {
-                    model: Grado
-                }
+                { model: Padre },
+                { model: Grado }
             ],
 
             limit: 10

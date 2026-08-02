@@ -31,10 +31,43 @@ async function findAll(req, res) {
         res.status(400).send(error);
     }
 }
+async function findByPadre(req, res) {
+    try {
 
-// =========================
-// Registrar calificación
-// =========================
+        const alumnos = await Alumno.findAll({
+            where: {
+                DNI_Padre: req.params.dni
+            },
+            attributes: ['DNI']
+        });
+
+        const dnis = alumnos.map(a => a.DNI);
+
+        const data = await Calificacion.findAll({
+            where: {
+                DNI_Alumno: dnis
+            },
+            include: [
+                {
+                    model: Alumno,
+                    attributes: ['DNI', 'Nombre', 'Apellido']
+                },
+                {
+                    model: Clase,
+                    attributes: ['ID_Clase', 'Nombre_Clase']
+                }
+            ]
+        });
+
+        res.status(200).send(data);
+
+    } catch (error) {
+        res.status(400).send({
+            message: error.message
+        });
+    }
+}
+
 // =========================
 // Registrar calificación
 // =========================
@@ -54,6 +87,8 @@ async function insertCalificacion(req, res) {
 
         if (!calificacion) {
 
+            // No existía, se crea con lo que venga (incluyendo null si el
+            // parcial llega vacío desde el frontend)
             calificacion = await Calificacion.create({
 
                 DNI_Alumno: req.body.DNI_Alumno,
@@ -70,26 +105,30 @@ async function insertCalificacion(req, res) {
 
         } else {
 
-            if (req.body.Parcial1 !== null)
-                calificacion.Parcial1 = req.body.Parcial1;
-
-            if (req.body.Parcial2 !== null)
-                calificacion.Parcial2 = req.body.Parcial2;
-
-            if (req.body.Parcial3 !== null)
-                calificacion.Parcial3 = req.body.Parcial3;
-
-            if (req.body.Parcial4 !== null)
-                calificacion.Parcial4 = req.body.Parcial4;
+            // Ya existía: se sobreescribe SIEMPRE con lo que llega del
+            // frontend, incluyendo null (antes se ignoraba el null y
+            // por eso una nota borrada "regresaba" al guardar)
+            calificacion.Parcial1 = req.body.Parcial1;
+            calificacion.Parcial2 = req.body.Parcial2;
+            calificacion.Parcial3 = req.body.Parcial3;
+            calificacion.Parcial4 = req.body.Parcial4;
 
         }
 
-        const p1 = Number(calificacion.Parcial1) || 0;
-        const p2 = Number(calificacion.Parcial2) || 0;
-        const p3 = Number(calificacion.Parcial3) || 0;
-        const p4 = Number(calificacion.Parcial4) || 0;
+        // Criterio único: promedio de los parciales no vacíos,
+        // ignorando los que están en null/undefined/vacío.
+        // Si no hay ningún parcial registrado, el promedio es null.
+        const parciales = [
+            calificacion.Parcial1,
+            calificacion.Parcial2,
+            calificacion.Parcial3,
+            calificacion.Parcial4
+        ].filter(p => p !== null && p !== undefined && p !== "")
+         .map(Number);
 
-        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
+        calificacion.Promedio = parciales.length === 0
+            ? null
+            : parciales.reduce((suma, valor) => suma + valor, 0) / parciales.length;
 
         await calificacion.save();
 
@@ -127,24 +166,26 @@ async function updateCalificacion(req, res) {
         calificacion.DNI_Alumno = req.body.DNI_Alumno;
         calificacion.ID_Clase = req.body.ID_Clase;
 
-        if (req.body.Parcial1 !== null)
-            calificacion.Parcial1 = req.body.Parcial1;
+        // Igual que en insertCalificacion: se sobreescribe siempre,
+        // sin el "if (!== null)" que impedía borrar una nota
+        calificacion.Parcial1 = req.body.Parcial1;
+        calificacion.Parcial2 = req.body.Parcial2;
+        calificacion.Parcial3 = req.body.Parcial3;
+        calificacion.Parcial4 = req.body.Parcial4;
 
-        if (req.body.Parcial2 !== null)
-            calificacion.Parcial2 = req.body.Parcial2;
+        // Criterio único: promedio de los parciales no vacíos,
+        // ignorando los que están en null/undefined/vacío.
+        const parciales = [
+            calificacion.Parcial1,
+            calificacion.Parcial2,
+            calificacion.Parcial3,
+            calificacion.Parcial4
+        ].filter(p => p !== null && p !== undefined && p !== "")
+         .map(Number);
 
-        if (req.body.Parcial3 !== null)
-            calificacion.Parcial3 = req.body.Parcial3;
-
-        if (req.body.Parcial4 !== null)
-            calificacion.Parcial4 = req.body.Parcial4;
-
-        const p1 = Number(calificacion.Parcial1) || 0;
-        const p2 = Number(calificacion.Parcial2) || 0;
-        const p3 = Number(calificacion.Parcial3) || 0;
-        const p4 = Number(calificacion.Parcial4) || 0;
-
-        calificacion.Promedio = (p1 + p2 + p3 + p4) / 4;
+        calificacion.Promedio = parciales.length === 0
+            ? null
+            : parciales.reduce((suma, valor) => suma + valor, 0) / parciales.length;
 
         await calificacion.save();
 
@@ -192,6 +233,7 @@ async function deleteCalificacion(req, res) {
 module.exports = {
 
     findAll,
+    findByPadre,
     insertCalificacion,
     updateCalificacion,
     deleteCalificacion
