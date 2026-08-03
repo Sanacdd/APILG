@@ -5,6 +5,8 @@ const db = require('../config/db');
 const Calificacion = db.calificacion;
 const Alumno = db.alumno;
 const Clase = db.clase;
+const Grado = db.grado;
+const PDFDocument = require('pdfkit');
 
 // =========================
 // Obtener todas las calificaciones
@@ -31,6 +33,7 @@ async function findAll(req, res) {
         res.status(400).send(error);
     }
 }
+
 async function findByPadre(req, res) {
     try {
 
@@ -75,7 +78,6 @@ async function insertCalificacion(req, res) {
 
     try {
 
-        // Buscar si ya existe una calificación para ese alumno y esa clase
         let calificacion = await Calificacion.findOne({
 
             where: {
@@ -87,8 +89,6 @@ async function insertCalificacion(req, res) {
 
         if (!calificacion) {
 
-            // No existía, se crea con lo que venga (incluyendo null si el
-            // parcial llega vacío desde el frontend)
             calificacion = await Calificacion.create({
 
                 DNI_Alumno: req.body.DNI_Alumno,
@@ -105,9 +105,6 @@ async function insertCalificacion(req, res) {
 
         } else {
 
-            // Ya existía: se sobreescribe SIEMPRE con lo que llega del
-            // frontend, incluyendo null (antes se ignoraba el null y
-            // por eso una nota borrada "regresaba" al guardar)
             calificacion.Parcial1 = req.body.Parcial1;
             calificacion.Parcial2 = req.body.Parcial2;
             calificacion.Parcial3 = req.body.Parcial3;
@@ -115,9 +112,6 @@ async function insertCalificacion(req, res) {
 
         }
 
-        // Criterio único: promedio de los parciales no vacíos,
-        // ignorando los que están en null/undefined/vacío.
-        // Si no hay ningún parcial registrado, el promedio es null.
         const parciales = [
             calificacion.Parcial1,
             calificacion.Parcial2,
@@ -166,15 +160,11 @@ async function updateCalificacion(req, res) {
         calificacion.DNI_Alumno = req.body.DNI_Alumno;
         calificacion.ID_Clase = req.body.ID_Clase;
 
-        // Igual que en insertCalificacion: se sobreescribe siempre,
-        // sin el "if (!== null)" que impedía borrar una nota
         calificacion.Parcial1 = req.body.Parcial1;
         calificacion.Parcial2 = req.body.Parcial2;
         calificacion.Parcial3 = req.body.Parcial3;
         calificacion.Parcial4 = req.body.Parcial4;
 
-        // Criterio único: promedio de los parciales no vacíos,
-        // ignorando los que están en null/undefined/vacío.
         const parciales = [
             calificacion.Parcial1,
             calificacion.Parcial2,
@@ -230,12 +220,174 @@ async function deleteCalificacion(req, res) {
 
 }
 
+// =========================
+// Boletín individual de calificaciones (un alumno por PDF)
+// =========================
+async function generarBoletinAlumno(req, res) {
+    const { dni } = req.params;
+
+    try {
+        const alumno = await Alumno.findByPk(dni, {
+            include: [{ model: Grado }]
+        });
+
+        if (!alumno) {
+            return res.status(404).send({ message: "Alumno no encontrado" });
+        }
+
+        const calificaciones = await Calificacion.findAll({
+            where: { DNI_Alumno: dni },
+            include: [{ model: Clase, attributes: ['ID_Clase', 'Nombre_Clase'] }]
+        });
+
+        const doc = new PDFDocument({ size: 'LETTER', margin: 50 });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=boletin_${alumno.DNI}.pdf`);
+
+        doc.pipe(res);
+
+        const LEFT = 50;
+        const ANCHO_TOTAL = 500;
+
+        // Encabezado
+        doc.fontSize(16).font('Helvetica-Bold').text('BOLETÍN DE CALIFICACIONES', { align: 'center' });
+        doc.moveDown(1.2);
+
+        const gradoTexto = alumno.Grado
+            ? `${alumno.Grado.Nombre_Grado} - ${alumno.Grado.Seccion || 'Única'}`
+            : 'No asignado';
+        const anio = alumno.Grado?.Anio || new Date().getFullYear();
+
+        doc.fontSize(10.5).font('Helvetica-Bold').text('Alumno: ', LEFT, doc.y, { continued: true });
+        doc.font('Helvetica').text(`${alumno.Nombre} ${alumno.Apellido}`);
+
+        doc.font('Helvetica-Bold').text('DNI: ', LEFT, doc.y, { continued: true });
+        doc.font('Helvetica').text(alumno.DNI);
+
+        doc.font('Helvetica-Bold').text('Grado: ', LEFT, doc.y, { continued: true });
+        doc.font('Helvetica').text(gradoTexto);
+
+        doc.font('Helvetica-Bold').text('Año lectivo: ', LEFT, doc.y, { continued: true });
+        doc.font('Helvetica').text(String(anio));
+
+        doc.moveDown(1.5);
+
+        // Tabla de materias
+        const columnas = [
+            { titulo: 'Materia', ancho: 160 },
+            { titulo: 'Parcial 1', ancho: 60 },
+            { titulo: 'Parcial 2', ancho: 60 },
+            { titulo: 'Parcial 3', ancho: 60 },
+            { titulo: 'Parcial 4', ancho: 60 },
+            { titulo: 'Promedio', ancho: 55 },
+            { titulo: 'Estado', ancho: 45 }
+        ];
+        const ALTO_FILA = 24;
+
+        const formatearNota = (n) => (n === null || n === undefined ? '-' : Number(n).toFixed(2));
+
+        const dibujarEncabezadoTabla = (y) => {
+            let x = LEFT;
+            doc.font('Helvetica-Bold').fontSize(9);
+            columnas.forEach((col) => {
+                doc.rect(x, y, col.ancho, ALTO_FILA).fillAndStroke('#1f2937', '#000000');
+                doc.fillColor('#ffffff').text(col.titulo, x + 4, y + 7, { width: col.ancho - 8 });
+                x += col.ancho;
+            });
+            doc.fillColor('#000000');
+            return y + ALTO_FILA;
+        };
+
+        const dibujarFila = (y, valores, colorFondo) => {
+            let x = LEFT;
+            doc.font('Helvetica').fontSize(9);
+            valores.forEach((valor, i) => {
+                const col = columnas[i];
+                doc.rect(x, y, col.ancho, ALTO_FILA).fillAndStroke(colorFondo, '#cccccc');
+                doc.fillColor('#000000').text(String(valor), x + 4, y + 7, { width: col.ancho - 8 });
+                x += col.ancho;
+            });
+            return y + ALTO_FILA;
+        };
+
+        let y = doc.y;
+        y = dibujarEncabezadoTabla(y);
+
+        let sumaPromedios = 0;
+        let contadorMaterias = 0;
+
+        if (calificaciones.length === 0) {
+            doc.font('Helvetica').fontSize(10).text(
+                'Este alumno no tiene calificaciones registradas.',
+                LEFT, y + 10
+            );
+        } else {
+            calificaciones.forEach((c, idx) => {
+                // Recalculado en el momento, ignorando el campo Promedio ya guardado
+                // (evita arrastrar promedios mal calculados de registros antiguos)
+                const parciales = [c.Parcial1, c.Parcial2, c.Parcial3, c.Parcial4]
+                    .filter(p => p !== null && p !== undefined && p !== "")
+                    .map(Number);
+
+                const promedio = parciales.length === 0
+                    ? null
+                    : parciales.reduce((suma, v) => suma + v, 0) / parciales.length;
+
+                const estado = promedio === null
+                    ? '-'
+                    : (promedio >= 70 ? 'Aprobado' : 'Reprobado');
+
+                const colorFondo = idx % 2 === 0 ? '#ffffff' : '#f3f4f6';
+
+                y = dibujarFila(y, [
+                    c.Clase?.Nombre_Clase || 'Materia',
+                    formatearNota(c.Parcial1),
+                    formatearNota(c.Parcial2),
+                    formatearNota(c.Parcial3),
+                    formatearNota(c.Parcial4),
+                    formatearNota(promedio),
+                    estado
+                ], colorFondo);
+
+                if (promedio !== null) {
+                    sumaPromedios += promedio;
+                    contadorMaterias++;
+                }
+            });
+        }
+
+        doc.moveDown(2);
+
+        if (contadorMaterias > 0) {
+            const promedioGeneral = sumaPromedios / contadorMaterias;
+            doc.font('Helvetica-Bold').fontSize(11).text(
+                `PROMEDIO GENERAL: ${promedioGeneral.toFixed(2)}  —  ${promedioGeneral >= 70 ? 'APROBADO' : 'REPROBADO'}`,
+                LEFT
+            );
+        }
+
+        doc.moveDown(4);
+        doc.font('Helvetica-Bold').fontSize(10).text('_____________________________', { align: 'center' });
+        doc.font('Helvetica').fontSize(9).text('Firma y sello', { align: 'center' });
+
+        doc.end();
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Error al generar el boletín"
+        });
+    }
+}
+
 module.exports = {
 
     findAll,
     findByPadre,
     insertCalificacion,
     updateCalificacion,
-    deleteCalificacion
+    deleteCalificacion,
+    generarBoletinAlumno
 
 };
