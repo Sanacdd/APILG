@@ -10,4 +10,8 @@ apiRoutes.post(
     maestroGradoController.asignarMaestro
 );
 
+apiRoutes.get(
+    '/maestro-grado/:dni/alumnos',
+    maestroGradoController.obtenerAlumnosPorMaestro
+);
 module.exports = apiRoutes;
