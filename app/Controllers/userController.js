@@ -203,6 +203,40 @@ async function cambiarRol(req, res) {
   }
 }
 
+const NOMBRES_ROL = {
+  1: 'Administrador',
+  2: 'Maestro',
+  3: 'Padre',
+};
+
+function obtenerNombreRol(rolId) {
+  return NOMBRES_ROL[rolId] || 'Desconocido';
+}
+
+async function obtenerNombreUsuario(userId, rolId) {
+  if (rolId === 1) {
+    return obtenerNombreRol(rolId);
+  }
+
+  if (rolId === 2) {
+    const maestro = await Maestro.findByPk(userId);
+
+    if (maestro) {
+      return `${maestro.Nombre.trim()} ${maestro.Apellido.trim()}`.trim();
+    }
+  }
+
+  if (rolId === 3) {
+    const padre = await Padre.findByPk(userId);
+
+    if (padre) {
+      return `${padre.Nombre.trim()} ${padre.Apellido.trim()}`.trim();
+    }
+  }
+
+  return userId;
+}
+
 async function singIn(req, res) {
   try {
     const userId = req.body.Id;
@@ -239,10 +273,18 @@ async function singIn(req, res) {
       });
     }
 
+    const rolNombre = obtenerNombreRol(usuario.rolId);
+    const nombre = await obtenerNombreUsuario(
+      usuario.userId,
+      usuario.rolId
+    );
+
     return res.status(200).send({
       message: 'Logged In',
       userId: usuario.userId,
       rolId: usuario.rolId,
+      rolNombre,
+      nombre,
       token: tokenService.createToken(
         usuario.userId,
         usuario.rolId

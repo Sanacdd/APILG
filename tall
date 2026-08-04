@@ -1,0 +1,29 @@
+*   [33mbbbf2a1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpadres-alejandro[m[33m, [m[1;31morigin/padres-alejandro[m[33m)[m Merge remote-tracking branch 'origin/carlos-clase' into padres-alejandro
+[31m|[m[32m\[m  
+[31m|[m * [33m8775288[m[33m ([m[1;31morigin/carlos-clase[m[33m)[m feat: agregar gestion de contraseñas de usuarios
+[31m|[m *   [33md6d216b[m Merge remote-tracking branch 'origin/carolina' into carlos-clase
+[31m|[m [33m|[m[34m\[m  
+[31m|[m * [34m\[m   [33m9b8ed95[m A
+[31m|[m [35m|[m[36m\[m [34m\[m  
+* [35m|[m [36m\[m [34m\[m   [33m52ddd46[m Merge remote-tracking branch 'origin/sanabria' into padres-alejandro # Please enter a commit message to explain why this merge is necessary, # especially if it merges an updated upstream into a topic branch. # # Lines starting with '#' will be ignored, and an empty message aborts # the commit.
+[1;31m|[m[1;32m\[m [35m\[m [36m\[m [34m\[m  
+[1;31m|[m * [35m|[m [36m|[m [34m|[m [33m1c6ed95[m[33m ([m[1;31morigin/sanabria[m[33m)[m Se agrego imagenes a los pdf que genera y la carpeta assets junto a las imagenes
+* [1;32m|[m [35m|[m [36m|[m [34m|[m [33m6b59073[m[33m ([m[1;31morigin/tesly[m[33m)[m fix: mostrar solo maestro titular en grados
+* [1;32m|[m [35m|[m [36m|[m [34m|[m [33mf0955e3[m chore: resolver conflicto de env al actualizar desde carolina
+[34m|[m [1;32m|[m[34m_[m[35m|[m[34m_[m[36m|[m[34m/[m  
+[34m|[m[34m/[m[1;32m|[m [35m|[m [36m|[m   
+* [1;32m|[m [35m|[m [36m|[m   [33mffdfadd[m[33m ([m[1;31morigin/carolina[m[33m)[m Merge remote-tracking branch 'origin/tesly' into carolina
+[1;33m|[m[36m\[m [1;32m\[m [35m\[m [36m\[m  
+[1;33m|[m [36m|[m [1;32m|[m[36m_[m[35m|[m[36m/[m  
+[1;33m|[m [36m|[m[36m/[m[1;32m|[m [35m|[m   
+[1;33m|[m * [1;32m|[m [35m|[m [33m5705b56[m feat: mejorar autenticacion y asignacion de maestros
+[1;33m|[m * [1;32m|[m [35m|[m   [33mf22cf59[m Merge branch 'Jese-V2' into tesly
+[1;33m|[m [1;35m|[m[1;36m\[m [1;32m\[m [35m\[m  
+[1;33m|[m * [1;36m\[m [1;32m\[m [35m\[m   [33m6971bcb[m Merge rama Jese-v2 en tesly
+[1;33m|[m [31m|[m[32m\[m [1;36m\[m [1;32m\[m [35m\[m  
+* [31m|[m [32m\[m [1;36m\[m [1;32m\[m [35m\[m   [33m4197e4a[m merge: integrar cambios de sanabria
+[33m|[m[1;32m\[m [31m\[m [32m\[m [1;36m\[m [1;32m\[m [35m\[m  
+[33m|[m [1;32m|[m [31m|[m[1;32m_[m[32m|[m[1;32m_[m[1;36m|[m[1;32m/[m [35m/[m  
+[33m|[m [1;32m|[m[1;32m/[m[31m|[m [32m|[m [1;36m|[m [35m|[m   
+[33m|[m * [31m|[m [32m|[m [1;36m|[m [35m|[m [33m79dd211[m Cambios en archivos y calificaciones boton para generar boletin
+[33m|[m * [31m|[m [32m|[m [1;36m|[m [35m|[m [33m3a09661[m Guardar cambios de demas ramas
