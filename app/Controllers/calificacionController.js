@@ -1,5 +1,6 @@
 'use strict'
 
+const path = require('path');
 const db = require('../config/db');
 
 const Calificacion = db.calificacion;
@@ -7,6 +8,38 @@ const Alumno = db.alumno;
 const Clase = db.clase;
 const Grado = db.grado;
 const PDFDocument = require('pdfkit');
+
+const RUTA_BANNER = path.join(__dirname, '../assets/banner_gobierno.png');
+const RUTA_ESCUDO = path.join(__dirname, '../assets/escudo_escuela.png');
+
+// Mismo dibujo de membrete que en archivoController.js, con el escudo más grande y espaciado ajustado
+function dibujarMembrete(doc, margenIzq, anchoUtil) {
+    const anchoBanner = anchoUtil * 0.62;
+    const altoBanner = anchoBanner * (102 / 710);
+    const xBanner = margenIzq + (anchoUtil - anchoBanner) / 2;
+    const yBanner = 25;
+
+    try {
+        doc.image(RUTA_BANNER, xBanner, yBanner, { width: anchoBanner });
+    } catch (e) {
+        console.error('No se pudo cargar el banner de gobierno:', e.message);
+    }
+
+    const yDespuesBanner = yBanner + altoBanner + 8;
+
+    // Escudo más grande (90) para mantener consistencia con los demás controladores
+    const anchoEscudo = 90;
+    const altoEscudo = anchoEscudo * (108 / 76);
+    const xEscudo = margenIzq + (anchoUtil / 2) - (anchoEscudo / 2);
+
+    try {
+        doc.image(RUTA_ESCUDO, xEscudo, yDespuesBanner, { width: anchoEscudo });
+    } catch (e) {
+        console.error('No se pudo cargar el escudo de la escuela:', e.message);
+    }
+
+    return yDespuesBanner + altoEscudo + 14;
+}
 
 // =========================
 // Obtener todas las calificaciones
@@ -221,7 +254,7 @@ async function deleteCalificacion(req, res) {
 }
 
 // =========================
-// Boletín individual de calificaciones (un alumno por PDF)
+// Boletín individual de calificaciones (un alumno por PDF, con membrete completo)
 // =========================
 async function generarBoletinAlumno(req, res) {
     const { dni } = req.params;
@@ -248,7 +281,10 @@ async function generarBoletinAlumno(req, res) {
         doc.pipe(res);
 
         const LEFT = 50;
-        const ANCHO_TOTAL = 500;
+        const ANCHO_UTIL = 612 - LEFT * 2;
+
+        const yInicioTexto = dibujarMembrete(doc, LEFT, ANCHO_UTIL);
+        doc.y = yInicioTexto;
 
         // Encabezado
         doc.fontSize(16).font('Helvetica-Bold').text('BOLETÍN DE CALIFICACIONES', { align: 'center' });
@@ -324,8 +360,6 @@ async function generarBoletinAlumno(req, res) {
             );
         } else {
             calificaciones.forEach((c, idx) => {
-                // Recalculado en el momento, ignorando el campo Promedio ya guardado
-                // (evita arrastrar promedios mal calculados de registros antiguos)
                 const parciales = [c.Parcial1, c.Parcial2, c.Parcial3, c.Parcial4]
                     .filter(p => p !== null && p !== undefined && p !== "")
                     .map(Number);
