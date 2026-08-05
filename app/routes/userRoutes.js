@@ -2,15 +2,28 @@
 
 const express = require('express');
 const userController = require('../Controllers/userController');
+const isAuth = require('../middlewares/auth');
+const role = require('../middlewares/role');
 
 const router = express.Router();
 
-router.post('/signUp', async (req, res) => {
-    await userController.singUp(req, res);
-});
+/* Inicio de sesión */
+router.post('/signIn', userController.singIn);
 
-router.post('/signIn', async (req, res) => {
-    await userController.singIn(req, res);
-});
+/* Gestión de usuarios: solo administrador */
+
+router.get(
+  '/usuarios',
+  isAuth,
+  role.isAdmin,
+  userController.listarUsuarios
+);
+
+router.put(
+  '/usuarios/:userId/password',
+  isAuth,
+  role.isAdmin,
+  userController.cambiarPassword
+);
 
 module.exports = router;
